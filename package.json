@@ -14,7 +14,8 @@
     "@fortawesome/vue-fontawesome": "^3.0.8",
     "@tailwindcss/vite": "^4.1.11",
     "tailwindcss": "^4.1.11",
-    "vue": "^3.5.17"
+    "vue": "^3.5.17",
+    "vue-inline-svg": "^4.0.1"
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^6.0.0",
