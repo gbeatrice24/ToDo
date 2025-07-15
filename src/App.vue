@@ -1,10 +1,10 @@
-<script setup lang="ts">
-import TodoHeader from './components/TodoHeader.vue';
-</script>
-
 <template>
-  <TodoHeader/>
+  <MainLayout/>
 </template>
+
+<script setup lang="ts">
+import MainLayout from './layout/MainLayout.vue';
+</script>
 
 <style scoped>
 .logo {
