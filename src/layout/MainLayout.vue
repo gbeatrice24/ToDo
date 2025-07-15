@@ -6,7 +6,13 @@
             <img src="../assets/notodos.png" alt="NoTodos" class="max-w-xs mx-auto">
         </div>
         <div v-else class="flex justify-center items-center">
-            <li v-for="task in tasks">{{ task.name }}</li>
+            <div class="task-list grid gap-4">
+                <TaskElement 
+                    v-for="task in tasks" 
+                    :key="task.id" 
+                    :task="task" 
+                />
+            </div>
         </div>
 
     </div>
@@ -14,17 +20,22 @@
 
 <script setup lang="ts">
 import TodoHeader from './TodoHeader.vue';
+import TaskElement from '@/components/TaskElement.vue';
+import { Task } from '@/types/Task';
 import { ref, computed } from 'vue'
-
-interface Task {
-    id: number
-    name: string
-    desc: string
-    priority: string
-}
 
 const tasks = ref<Task[]>([])
 let nextId = 0
+
+const task = ({
+        id: ++nextId,
+        name: `Task ${nextId}`,
+        desc: `This is a description`,
+        priority: 'High',
+        done: false,
+        date: new Date().toLocaleDateString()
+    })
+    tasks.value.push(task)
 
 const isEmpty = computed(() => tasks.value.length == 0)
 
@@ -34,6 +45,8 @@ function handleAddTask(){
         name: `Task ${nextId}`,
         desc: `This is a description`,
         priority: 'High',
+        done: false,
+        date: new Date().toLocaleDateString()
     })
     tasks.value.push(task)
 
