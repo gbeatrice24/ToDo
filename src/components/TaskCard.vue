@@ -1,7 +1,6 @@
 <template>
     <div class="p-4 rounded-2xl shadow border space-y-5" :class="isMobile ? 'border-2 max-w-xl' : ''">
-        <div :class="isMobile ? 'flex items-center' : 'flex items-center'">
-
+        <div class="flex items-center">
             <!--done button on phone-->
             <button v-if="isMobile" @click="$emit('done-clicked', task.id)" class="relative w-6 h-6">
                 <img v-if="!task.done" src="../assets/notDoneButton.png" />
