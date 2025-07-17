@@ -2,13 +2,11 @@
     <div class="min-h-screen space-y-15">
         <TodoHeader @add-task="handleAddTask" />
 
-        <div v-if="isEmpty" class="flex justify-center items-center">
-            <img src="../assets/notodos.png" alt="NoTodos" class="max-w-xs mx-auto">
-        </div>
-        <div v-else class="flex justify-center items-center">
-            <div class="task-list grid gap-8">
-                <component v-for="task in tasks" :is="isMobile ? MobileTaskCard : DesktopTaskCard" :key="task.id"
-                    :task="task" @done-clicked="handleDoneClicked" />
+        <div class="flex justify-center items-center ">
+            <img v-if="isEmpty" src="../assets/notodos.png" alt="NoTodos" class="max-w-xs mx-auto">
+
+            <div v-else class="grid gap-8">
+                <TaskCard v-for="task in tasks" :key="task.id" :task="task" @done-clicked="handleDoneClicked" />
             </div>
         </div>
 
@@ -17,24 +15,19 @@
 
 <script setup lang="ts">
 import TodoHeader from './TodoHeader.vue';
-import DesktopTaskCard from '@/components/DesktopTaskCard.vue';
-import MobileTaskCard from '@/components/MobileTaskCard.vue';
+import TaskCard from '@/components/TaskCard.vue';
 
 import { Task } from '@/types/Task';
 
-import { ref, computed, reactive } from 'vue'
+import { ref, computed } from 'vue'
 
-import { useWindowSize } from '@vueuse/core'
 
 const tasks = ref<Task[]>([])
 let nextId = 0
 const isEmpty = computed(() => tasks.value.length == 0)
 
-const { width } = useWindowSize()
-const isMobile = computed(() => width.value < 768)
-
 function handleAddTask() {
-    const task = reactive({
+    const task = ({
         id: ++nextId,
         name: `Task ${nextId}`,
         desc: `This is a description`,
@@ -48,14 +41,11 @@ function handleAddTask() {
 }
 
 function handleDoneClicked(id: number) {
-    tasks.value = tasks.value.map((task) => {
-        if (task.id === id) {
-            task.done = !task.done
-        }
-        return { ...task }
-    })
-
-    console.log("Task", id, "done button clicked")
+    const task = tasks.value.find(task => task.id === id)
+    if (task) {
+        tasks.value.splice(id - 1, 1, { ...task, done: !task.done })
+        console.log("Task", id, "done modified")
+    }
 }
 
 
