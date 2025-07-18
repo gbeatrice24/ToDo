@@ -29,9 +29,12 @@
             </div>
 
             <!-- task info -->
-            <div :class="isMobile ? 'order-2 pl-4' : 'order-1 w-3/4'">
-                <h3 class="font-semibold text-black text-2xl">{{ task.name }}</h3>
-                <p class="text-gray-500 w-xs">{{ isMobile ? task.date : task.desc }}</p>
+            <div @click="$emit('edit-requested', task.id)" :class="isMobile ? 'order-2 pl-4' : 'order-1 w-3/4'">
+                <form>
+                    <input v-model="task.name" class="font-semibold text-black text-2xl" :disabled="!task.edit">
+                    <p class="text-gray-500 w-xs">{{ isMobile ? task.date : task.desc }}</p>
+
+                </form>
             </div>
 
         </div>
@@ -42,15 +45,19 @@
 import { Task } from '@/types/Task';
 import { getTaskBgColor } from '@/utils/getTaskBgColor';
 import { useWindowSize } from '@vueuse/core'
-import { computed } from 'vue'
+import { ref, computed } from 'vue'
 
 
 defineEmits<{
-    (e: 'done-clicked', id: number): void
+    (e: 'done-clicked', id: number): void,
+    (e: 'edit-requested', id: number): void,
+    (e: 'save-clicked', id: number): void,
 }>()
 
 const props = defineProps<{ task: Task }>()
 const bgColor = getTaskBgColor(props.task)
+const name = ref(props.task.name)
+const descChange = ref('')
 
 const { width } = useWindowSize()
 const isMobile = computed(() => width.value < 768)

@@ -29,22 +29,24 @@ const isEmpty = computed(() => tasks.value.length == 0)
 function handleAddTask() {
     const task = ({
         id: ++nextId,
-        name: `Task ${nextId}`,
-        desc: `This is a description`,
+        name: `Task`,
+        desc: `Here goes the description`,
         priority: 'High',
         done: false,
         date: new Date().toLocaleDateString(),
+        editing: false
     })
-    tasks.value.push(task)
+    tasks.value.unshift(task)
 
     console.log('new task added:', task)
 }
 
 function handleDoneClicked(id: number) {
     const task = tasks.value.find(task => task.id === id)
+    const realId = tasks.value.length - id
     if (task) {
-        tasks.value.splice(id - 1, 1, { ...task, done: !task.done })
-        console.log("Task", id, "done modified")
+        tasks.value.splice(realId, 1, { ...task, done: !task.done })
+        console.log("Task", realId, "done modified")
     }
 }
 
@@ -58,8 +60,9 @@ const task1 = ({
     priority: 'High',
     done: false,
     date: new Date().toLocaleDateString(),
+    editing: false
 })
-tasks.value.push(task1)
+tasks.value.unshift(task1)
 
 const task2 = ({
     id: ++nextId,
@@ -68,8 +71,9 @@ const task2 = ({
     priority: 'Medium',
     done: false,
     date: new Date().toLocaleDateString(),
+    editing: false
 })
-tasks.value.push(task2)
+tasks.value.unshift(task2)
 
 const task3 = ({
     id: ++nextId,
@@ -78,8 +82,9 @@ const task3 = ({
     priority: 'Low',
     done: false,
     date: new Date().toLocaleDateString(),
+    editing: false
 })
-tasks.value.push(task3)
+tasks.value.unshift(task3)
 
 
 </script>
