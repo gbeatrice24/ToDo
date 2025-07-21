@@ -8,7 +8,7 @@
             <div v-else class="grid gap-8">
                 <TaskCard v-for="task in tasks" :key="task.id" :task="task" @done-clicked="handleDoneClicked"
                     @edit-requested="handleEditRequested" @save-clicked="handleSaveClicked"
-                    @delete-clicked="handleDeleteClicked" />
+                    @delete-clicked="handleDeleteClicked" @priority-chosen="handlePriorityChoosen" />
             </div>
         </div>
 
@@ -16,11 +16,13 @@
 </template>
 
 <script setup lang="ts">
+// mikor hozaadodik legyen edit stateben, telefonon done ne nyiljon meg, ha egy edit statet megnyitunk a masik zarodjon be
+
+
 import TodoHeader from './TodoHeader.vue';
 import TaskCard from '@/components/TaskCard.vue';
 
 import { Task } from '@/types/Task';
-import { getTaskBgColor } from '@/utils/getTaskBgColor';
 
 import { ref, computed } from 'vue'
 
@@ -61,13 +63,13 @@ function handleEditRequested(id: number) {
     }
 }
 
-function handleSaveClicked(payload: { id: number, newDesc: string, newPrio: string }) {
-    const { id, newDesc, newPrio } = payload;
+function handleSaveClicked(payload: { id: number, newDesc: string }) {
+    const { id, newDesc, } = payload;
     const task = tasks.value.find(task => task.id === id)
     const realId = tasks.value.length - id
     if (task) {
-        tasks.value.splice(realId, 1, { ...task, priority: newPrio, desc: newDesc, editing: false })
-        console.log("Task", id, "changed", newDesc, newPrio)
+        tasks.value.splice(realId, 1, { ...task, desc: newDesc, editing: false })
+        console.log("Task", id, "changed", newDesc)
     }
 }
 
@@ -82,6 +84,16 @@ function handleDeleteClicked(id: number) {
     console.log(tasks.value)
 }
 
+function handlePriorityChoosen(payload: { id: number, prio: string }) {
+    const { id, prio } = payload;
+    const task = tasks.value.find(task => task.id === id)
+    const realId = tasks.value.length - id
+    if (task) {
+        tasks.value.splice(realId, 1, { ...task, priority: prio })
+        console.log("Task", id, "priority changed", prio)
+    }
+}
+
 function formatDate(date: Date) {
     const now = new Date();
     const year = String(now.getFullYear()).slice(-2);
@@ -90,8 +102,6 @@ function formatDate(date: Date) {
 
     return `${year}.${month}.${day}`
 }
-
-
 
 //////// TEST /////////
 const task3 = ({
@@ -126,6 +136,4 @@ const task1 = ({
     editing: true
 })
 tasks.value.unshift(task1)
-
-
 </script>
