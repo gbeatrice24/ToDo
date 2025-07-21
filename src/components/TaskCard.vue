@@ -89,15 +89,16 @@
                         :class="isMobile ? 'font-semibold rounded-lg p-2 w-15' : 'rounded-xl p-3 w-20'">Delete</button>
 
                     <!-- delete popup confirmation -->
-                    <div v-if="delPopupShowing" class="absolute z-50 flex items-center justify-center">
-                        <div v-if="delPopupShowing"
-                            class=" border p-4 rounded-xl shadow-lg bg-white space-y-4  space-x-3 text-center z-50">
+                    <div v-if="delPopupShowing" class="absolute z-50 flex items-center justify-center"
+                        :class="isMobile ? 'inset-0' : ''">
+                        <div class=" border p-4 rounded-xl shadow-lg bg-white space-y-4  space-x-3 text-center z-50"
+                            :class="isMobile ? 'w-10/11' : ''">
                             <h3 class="font-semibold">Are you sure you want to delete this item? This operation is
                                 permanent and you will not be able to undo this action!</h3>
                             <button @click="$emit('delete-clicked', task.id)"
                                 class="font-semibold bg-red-500 text-white w-15 "
                                 :class="isMobile ? 'font-semibold rounded-lg p-2' : 'rounded-xl h-10'">Yes</button>
-                            <button @click="delPopupShowing = false" class="font-semibold bg-gray-300 text-black w-15"
+                            <button @click="delPopupShowing = false" class="font-semibold bg-gray-300 text-black w-17"
                                 :class="isMobile ? 'rounded-lg p-2' : 'rounded-xl h-10'">Cancel</button>
                         </div>
                     </div>
