@@ -16,9 +16,6 @@
 </template>
 
 <script setup lang="ts">
-// mikor hozaadodik legyen edit stateben, telefonon done ne nyiljon meg, ha egy edit statet megnyitunk a masik zarodjon be
-
-
 import TodoHeader from './TodoHeader.vue';
 import TaskCard from '@/components/TaskCard.vue';
 
@@ -32,6 +29,8 @@ let nextId = 0
 const isEmpty = computed(() => tasks.value.length == 0)
 
 function handleAddTask() {
+    tasks.value.map(task => task.editing = false)
+
     const task = ({
         id: ++nextId,
         name: `Task`,
@@ -39,7 +38,7 @@ function handleAddTask() {
         priority: 'High',
         done: false,
         date: formatDate(new Date()),
-        editing: false
+        editing: true
     })
     tasks.value.unshift(task)
 
@@ -56,6 +55,7 @@ function handleDoneClicked(id: number) {
 }
 
 function handleEditRequested(id: number) {
+    tasks.value.map(task => task.editing = false)
     const task = tasks.value.find(task => task.id === id)
     const realId = tasks.value.length - id
     if (task) {
@@ -63,13 +63,18 @@ function handleEditRequested(id: number) {
     }
 }
 
-function handleSaveClicked(payload: { id: number, newDesc: string }) {
-    const { id, newDesc, } = payload;
+function handleSaveClicked(payload: {
+    id: number,
+    newName: string,
+    newDesc: string,
+    newPriority: string,
+}) {
+    const { id, newName, newDesc, newPriority } = payload;
     const task = tasks.value.find(task => task.id === id)
     const realId = tasks.value.length - id
     if (task) {
-        tasks.value.splice(realId, 1, { ...task, desc: newDesc, editing: false })
-        console.log("Task", id, "changed", newDesc)
+        tasks.value.splice(realId, 1, { ...task, name: newName, desc: newDesc, priority: newPriority, editing: false })
+        console.log("Task", id, "changed", newName, newDesc, newPriority)
     }
 }
 
@@ -80,6 +85,9 @@ function handleDeleteClicked(id: number) {
     if (task) {
         tasks.value.splice(realId, 1)
     }
+
+    tasks.value.map(task => (task.id > id) ? task.id-- : '')
+    nextId--;
 
     console.log(tasks.value)
 }
@@ -106,7 +114,7 @@ function formatDate(date: Date) {
 //////// TEST /////////
 const task3 = ({
     id: ++nextId,
-    name: `Task  `,
+    name: `Task`,
     desc: ``,
     priority: 'Low',
     done: false,
@@ -117,7 +125,7 @@ tasks.value.unshift(task3)
 
 const task2 = ({
     id: ++nextId,
-    name: `Task  `,
+    name: `Task`,
     desc: ``,
     priority: 'Medium',
     done: false,
