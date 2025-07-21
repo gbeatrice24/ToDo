@@ -1,6 +1,10 @@
 <template>
-    <div @click="$emit('edit-requested', task.id)" class="p-4 rounded-2xl shadow border space-y-5"
-        :class="isMobile ? 'border-2 max-w-xs' : ''">
+    <div @click="$emit('edit-requested', task.id)" class="p-4 rounded-2xl border-2"
+        :class="isMobile ? 'max-w-xs' : 'relative'">
+
+        <div v-if="!isMobile" class=" absolute inset-0 bg-white rounded-2xl"
+            :class="priorChooser ? 'opacity-50' : 'opacity-0 invisible'"></div>
+
         <div class="flex items-center">
             <!--done button on phone-->
             <button v-if="isMobile && !task.editing" @click="$emit('done-clicked', task.id)" class="relative w-6 h-6">
@@ -17,25 +21,40 @@
                     <input v-model="task.name" class="font-semibold text-black text-2xl outline-0 w-2/3">
 
                     <!-- task priority on desktop -->
-                    <button @click="priorChooser = true" v-if="!isMobile"
-                        class="relative flex items-center justify-center rounded-2xl order-3 ml-auto"
-                        :class="bgColor, isMobile ? 'h-3 w-3' : 'text-white text-xs w-auto pr-3 pl-3 h-5'">
-                        {{ isMobile ? '' : task.priority }}
-                        <img v-if="task.editing" src="@/assets/arrowDown.png" class="w-3 pl-1">
-                    </button>
+                    <div v-if="!isMobile" class="relative">
+                        <button @click="priorChooser = !priorChooser"
+                            class="relative flex items-center justify-center rounded-full order-3 w-20"
+                            :class="priorChooser ? 'bg-white text-black border-2' : [bgColor, 'text-white']">
+                            {{ task.priority }}
 
-                    <!-- <div v-if="priorChooser" class="absolute bottom-top left-3/5 bg-red-500">
-                        ez elol van
-                    </div> -->
+                            <div v-if="task.editing">
+                                <img v-if="!priorChooser" src="@/assets/arrowDown.png" class="w-3 pl-1">
+                                <img v-else src="@/assets/arrowDownB.png" class="w-3 pl-1">
+                            </div>
+                        </button>
+
+                        <!-- priority dropdown -->
+                        <div v-if="priorChooser"
+                            class="absolute top-full left-0 mt-1 w-full bg-white rounded-2xl border-2 z-10">
+                            <ul class="flex flex-col text-sm text-black">
+                                <li v-for="(priority, index) in priorities"
+                                    @click="$emit('priority-chosen', { id: task.id, prio: priority.level }); priorChooser = false"
+                                    class="px-2 hover:bg-gray-100" :class="[index === 0 ? 'rounded-t-2xl pt-2' : '',
+                                    index === 2 ? 'rounded-b-2xl pb-2' : '']">{{ priority.level }}
+                                </li>
+                            </ul>
+                        </div>
+
+                        <!--  <div class="absolute inset-0 bg-white pointer-events-none transition-opacity"
+                            :class="priorChooser ? 'opacity-25' : 'opacity-0'"></div> -->
+                    </div>
 
                     <!-- task priority on phone -> while being actively edited -->
                     <div v-if="isMobile && task.editing" class="flex flex-row order-3 space-x-2">
-                        <button @click="priority = 'Low'"
-                            class="rounded-2xl order-3 h-3 w-3 bg-teal-400 focus:outline-2"></button>
-                        <button @click="priority = 'Medium'"
-                            class="rounded-2xl order-3 h-3 w-3 bg-amber-500 focus:outline-2"></button>
-                        <button @click="priority = 'High'"
-                            class="rounded-2xl order-3 h-3 w-3 bg-red-500 focus:outline-2"></button>
+                        <button v-for="priority in priorities"
+                            @click="$emit('priority-chosen', { id: task.id, prio: priority.level })"
+                            class="rounded-full order-3 h-3 w-3 focus:outline-2"
+                            :class="getBgColor(priority.level)"></button>
                     </div>
                 </div>
 
@@ -47,7 +66,7 @@
                         </div>
                         <!-- resize on bigger text? -->
                         <textarea v-if="!isMobile || task.editing" v-model="text"
-                            placeholder="Here goes the description." class=" w-1/1 outline-0 resize-none"
+                            placeholder="Here goes the description." class=" w-90 outline-0 resize-none "
                             :class="task.editing ? 'h-20' : 'h-7'"></textarea>
                     </div>
 
@@ -72,14 +91,14 @@
             </div>
 
             <!-- task priority on phone -> when isn't actively being edited -->
-            <button v-if="isMobile && !task.editing" class="rounded-2xl order-3 h-3 w-3" :class="bgColor"></button>
+            <button v-if="isMobile && !task.editing" class="rounded-full order-3 h-3 w-3" :class="bgColor"></button>
         </div>
     </div>
 </template>
 
 <script setup lang="ts">
 import { Task } from '@/types/Task';
-import { getTaskBgColor } from '@/utils/getTaskBgColor';
+import { getBgColor, getTaskBgColor } from '@/utils/getTaskBgColor';
 import { useWindowSize } from '@vueuse/core'
 import { ref, computed } from 'vue'
 
@@ -93,6 +112,8 @@ defineEmits<{
 
     (e: 'save-clicked', payload: { id: number; newDesc: string, newPrio: string }): void,
     (e: 'delete-clicked', id: number): void,
+
+    (e: 'priority-chosen', payload: { id: number, prio: string }): void
 }>()
 
 const props = defineProps<{ task: Task }>()
@@ -103,7 +124,9 @@ const text = ref(props.task.desc)
 const priority = ref(props.task.priority)
 
 const priorChooser = ref(false)
+const priorities = ref([{ level: 'Low' }, { level: 'Medium' }, { level: 'High' }])
 
 const { width } = useWindowSize()
 const isMobile = computed(() => width.value < 768)
+
 </script>
