@@ -1,13 +1,12 @@
 <template>
-    <div @click="$emit('edit-requested', task.id)" class="p-4 rounded-2xl border-2"
-        :class="isMobile ? 'max-w-xs' : 'relative'">
+    <div @click="$emit('onEdit', task.id)" class="p-4 rounded-2xl border-2" :class="isMobile ? 'max-w-xs' : 'relative'">
 
         <div v-if="!isMobile" class=" absolute inset-0 bg-white rounded-2xl"
             :class="priorChooser ? 'opacity-50' : 'opacity-0 invisible'"></div>
 
         <div class="flex items-center">
             <!--done button on phone-->
-            <button v-if="isMobile && !task.editing" @click="$emit('done-clicked', task.id)" class="relative w-6 h-6">
+            <button v-if="isMobile && !task.editing" @click="$emit('onComplete', task.id)" class="relative w-6 h-6">
                 <img v-if="!task.done" src="../assets/notDoneButton.png" />
                 <div v-else>
                     <img class="absolute inset-0" src="../assets/doneButton.png" />
@@ -39,10 +38,9 @@
                         <div v-if="priorChooser"
                             class="absolute top-full left-0 mt-1 w-full bg-white rounded-2xl border-2 z-10">
                             <ul class="flex flex-col text-sm text-black">
-                                <li v-for="(priority, index) in priorities"
+                                <li v-for="priority in priorities"
                                     @click="newPriority = priority.level; priorChooser = false"
-                                    class="px-2 hover:bg-gray-100" :class="[index === 0 ? 'rounded-t-2xl pt-2' : '',
-                                    index === 2 ? 'rounded-b-2xl pb-2' : '']">{{ priority.level }}
+                                    class="px-2 hover:bg-gray-100" :class="priority.styleClass">{{ priority.level }}
                                 </li>
                             </ul>
                         </div>
@@ -69,7 +67,7 @@
                     </div>
 
                     <!-- done button on desktop -->
-                    <button v-if="!isMobile && !task.editing" @click.stop @click="$emit('done-clicked', task.id)"
+                    <button v-if="!isMobile && !task.editing" @click.stop="$emit('onComplete', task.id)"
                         class="relative w-6 h-6 ml-auto">
                         <img v-if="!task.done" src="../assets/notDoneButton.png" />
                         <div v-else>
@@ -81,10 +79,10 @@
 
                 <div v-if="task.editing" @click.stop class="space-x-3">
                     <button
-                        @click="$emit('save-clicked', { id: task.id, newName: newName, newDesc: newDesc, newPriority: newPriority })"
+                        @click="$emit('onSave', { id: task.id, newName: newName, newDesc: newDesc, newPriority: newPriority })"
                         class="bg-emerald-400 text-white text-xs"
                         :class="isMobile ? 'font-semibold rounded-lg p-2 w-15' : 'rounded-xl p-3 w-20'">Save</button>
-                    <!--  <button @click="$emit('delete-clicked', task.id)" class="bg-gray-300 text-black text-xs w-20" -->
+                    <!--  <button @click="$emit('onDelete', task.id)" class="bg-gray-300 text-black text-xs w-20" -->
                     <button @click="delPopupShowing = true" class="bg-gray-300 text-black text-xs w-20"
                         :class="isMobile ? 'font-semibold rounded-lg p-2 w-15' : 'rounded-xl p-3 w-20'">Delete</button>
 
@@ -95,7 +93,7 @@
                             :class="isMobile ? 'w-10/11' : ''">
                             <h3 class="font-semibold">Are you sure you want to delete this item? This operation is
                                 permanent and you will not be able to undo this action!</h3>
-                            <button @click="$emit('delete-clicked', task.id)"
+                            <button @click="$emit('onDelete', task.id)"
                                 class="font-semibold bg-red-500 text-white w-15 "
                                 :class="isMobile ? 'font-semibold rounded-lg p-2' : 'rounded-xl h-10'">Yes</button>
                             <button @click="delPopupShowing = false" class="font-semibold bg-gray-300 text-black w-17"
@@ -124,26 +122,29 @@ import { library } from '@fortawesome/fontawesome-svg-core'
 library.add(faCalendarDays)
 
 defineEmits<{
-    (e: 'done-clicked', id: number): void,
-    (e: 'edit-requested', id: number): void,
+    (e: 'onComplete', id: number): void,
+    (e: 'onEdit', id: number): void,
 
-    (e: 'save-clicked', payload: { id: number; newName: string; newDesc: string, newPriority: string }): void,
-    (e: 'delete-clicked', id: number): void,
+    (e: 'onSave', payload: { id: number; newName: string; newDesc: string, newPriority: string }): void,
+    (e: 'onDelete', id: number): void,
 
-    (e: 'priority-chosen', payload: { id: number, prio: string }): void
+    (e: 'pnPriorityModified', payload: { id: number, prio: string }): void
 }>()
 
 const props = defineProps<{ task: Task }>()
 
-let newName = ref(props.task.name)
-let newDesc = ref(props.task.desc)
-let newPriority = ref(props.task.priority)
+const newName = ref(props.task.name)
+const newDesc = ref(props.task.desc)
+const newPriority = ref(props.task.priority)
 
 const bgColor = computed(() => getBgColor(newPriority.value))
 const delPopupShowing = ref(false)
 
 const priorChooser = ref(false)
-const priorities = ref([{ level: 'Low' }, { level: 'Medium' }, { level: 'High' }])
+const priorities = ref([
+    { level: 'Low', styleClass: 'rounded-t-2xl pt-2' },
+    { level: 'Medium', styleClass: '' },
+    { level: 'High', styleClass: 'rounded-b-2xl pb-2' }])
 
 const { width } = useWindowSize()
 const isMobile = computed(() => width.value < 768)
