@@ -2,7 +2,7 @@
     <div @click="$emit('onEdit', task.id)" class="p-4 rounded-2xl border-2" :class="isMobile ? 'max-w-xs' : 'relative'">
 
         <div v-if="!isMobile" class=" absolute inset-0 bg-white rounded-2xl"
-            :class="priorChooser ? 'opacity-50' : 'opacity-0 invisible'"></div>
+            :class="isPriorityDropdownVisible ? 'opacity-50' : 'opacity-0 invisible'"></div>
 
         <div class="flex items-center">
             <!--done button on phone-->
@@ -23,27 +23,21 @@
 
                     <!-- task priority on desktop -->
                     <div v-if="!isMobile" class="relative">
-                        <button @click="priorChooser = !priorChooser"
+                        <button @click="isPriorityDropdownVisible = !isPriorityDropdownVisible"
                             class="relative flex items-center justify-center rounded-full order-3 w-20"
-                            :class="priorChooser ? 'bg-white text-black border-2' : [bgColor, 'text-white']">
+                            :class="isPriorityDropdownVisible ? 'bg-white text-black border-2' : [bgColor, 'text-white']">
                             {{ newPriority }}
 
                             <div v-if="task.editing">
-                                <img v-if="!priorChooser" src="@/assets/arrowDown.png" class="w-3 pl-1">
+                                <img v-if="!isPriorityDropdownVisible" src="@/assets/arrowDown.png" class="w-3 pl-1">
                                 <img v-else src="@/assets/arrowDownB.png" class="w-3 pl-1">
                             </div>
                         </button>
 
                         <!-- priority dropdown -->
-                        <div v-if="priorChooser"
-                            class="absolute top-full left-0 mt-1 w-full bg-white rounded-2xl border-2 z-10">
-                            <ul class="flex flex-col text-sm text-black">
-                                <li v-for="priority in priorities"
-                                    @click="newPriority = priority.level; priorChooser = false"
-                                    class="px-2 hover:bg-gray-100" :class="priority.styleClass">{{ priority.level }}
-                                </li>
-                            </ul>
-                        </div>
+                        <Dropdown v-if="isPriorityDropdownVisible" :choices="['High', 'Medium', 'Low']"
+                            @choiceSelected="handleChoiceSelected" />
+
                     </div>
 
                     <!-- task priority on phone -> while being actively edited -->
@@ -82,30 +76,19 @@
                         @click="$emit('onSave', { id: task.id, newName: newName, newDesc: newDesc, newPriority: newPriority })"
                         class="bg-emerald-400 text-white text-xs"
                         :class="isMobile ? 'font-semibold rounded-lg p-2 w-15' : 'rounded-xl p-3 w-20'">Save</button>
-                    <!--  <button @click="$emit('onDelete', task.id)" class="bg-gray-300 text-black text-xs w-20" -->
+
                     <button @click="delPopupShowing = true" class="bg-gray-300 text-black text-xs w-20"
                         :class="isMobile ? 'font-semibold rounded-lg p-2 w-15' : 'rounded-xl p-3 w-20'">Delete</button>
 
                     <!-- delete popup confirmation -->
-                    <div v-if="delPopupShowing" class="absolute z-50 flex items-center justify-center"
-                        :class="isMobile ? 'inset-0' : ''">
-                        <div class=" border p-4 rounded-xl shadow-lg bg-white space-y-4  space-x-3 text-center z-50"
-                            :class="isMobile ? 'w-10/11' : ''">
-                            <h3 class="font-semibold">Are you sure you want to delete this item? This operation is
-                                permanent and you will not be able to undo this action!</h3>
-                            <button @click="$emit('onDelete', task.id)"
-                                class="font-semibold bg-red-500 text-white w-15 "
-                                :class="isMobile ? 'font-semibold rounded-lg p-2' : 'rounded-xl h-10'">Yes</button>
-                            <button @click="delPopupShowing = false" class="font-semibold bg-gray-300 text-black w-17"
-                                :class="isMobile ? 'rounded-lg p-2' : 'rounded-xl h-10'">Cancel</button>
-                        </div>
-                    </div>
+                    <Popup v-if="delPopupShowing" :message="message" @confirmAction="handleDeleteConfirmation" />
 
                 </div>
             </div>
 
-            <!-- task priority on phone -> when isn't actively being edited -->
-            <button v-if="isMobile && !task.editing" class="rounded-full order-3 h-3 w-3" :class="bgColor"></button>
+            <!--task priority on phone -> when isn't actively being edited -->
+            <button v-if="isMobile && !task.editing" class="rounded-full order-3 h-3 w-3" :class="bgColor">
+            </button>
         </div>
     </div>
 </template>
@@ -116,19 +99,21 @@ import { getBgColor } from '@/utils/getTaskBgColor';
 import { useWindowSize } from '@vueuse/core'
 import { ref, computed, watch } from 'vue'
 
-import { faCalendarDays } from '@fortawesome/free-solid-svg-icons'
+import { faCalendarDays, faL } from '@fortawesome/free-solid-svg-icons'
 import { library } from '@fortawesome/fontawesome-svg-core'
+import Popup from './Popup.vue';
+import Dropdown from './Dropdown.vue';
 
 library.add(faCalendarDays)
 
-defineEmits<{
+const emit = defineEmits<{
     (e: 'onComplete', id: number): void,
     (e: 'onEdit', id: number): void,
 
     (e: 'onSave', payload: { id: number; newName: string; newDesc: string, newPriority: string }): void,
     (e: 'onDelete', id: number): void,
 
-    (e: 'pnPriorityModified', payload: { id: number, prio: string }): void
+    (e: 'onPriorityModified', payload: { id: number, prio: string }): void
 }>()
 
 const props = defineProps<{ task: Task }>()
@@ -140,7 +125,7 @@ const newPriority = ref(props.task.priority)
 const bgColor = computed(() => getBgColor(newPriority.value))
 const delPopupShowing = ref(false)
 
-const priorChooser = ref(false)
+const isPriorityDropdownVisible = ref(false)
 const priorities = ref([
     { level: 'Low', styleClass: 'rounded-t-2xl pt-2' },
     { level: 'Medium', styleClass: '' },
@@ -148,6 +133,9 @@ const priorities = ref([
 
 const { width } = useWindowSize()
 const isMobile = computed(() => width.value < 768)
+
+const message = ref("Are you sure you want to delete this item? This operation is permanent and you will not be able to undo this action!")
+
 
 watch(() => props.task.editing, (editing) => {
     delPopupShowing.value = false
@@ -160,6 +148,18 @@ function resetTaskCard() {
     newPriority.value = props.task.priority
 
     console.log("task card reseted", props.task.id)
+}
+
+function handleDeleteConfirmation(confirmed: boolean) {
+    if (confirmed) {
+        emit('onDelete', props.task.id)
+    }
+    delPopupShowing.value = false
+}
+
+function handleChoiceSelected(choice: string) {
+    newPriority.value = choice;
+    isPriorityDropdownVisible.value = false
 }
 
 </script>
