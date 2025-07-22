@@ -1,6 +1,7 @@
 <template>
-    <div @click="$emit('onEdit', task.id)" class="p-4 rounded-2xl border-2" :class="isMobile ? 'max-w-xs' : 'relative'">
+    <div @click="$emit('onEdit', task.id)" class="p-4 rounded-2xl border-2 max-w-xs md:max-w-xl md:relative">
 
+        <!-- dim bg for priority dropdown -->
         <div v-if="!isMobile" class=" absolute inset-0 bg-white rounded-2xl"
             :class="isPriorityDropdownVisible ? 'opacity-50' : 'opacity-0 invisible'"></div>
 
@@ -15,11 +16,10 @@
             </button>
 
             <!-- task info -->
-            <div :class="isMobile ? 'order-2 pl-2 w-7/8' : 'order-1 w-1/1'">
+            <div class="order-2 pl-2 w-7/8 md:'order-1 md:w-1/1">
                 <div class="flex flex-row space-x-10 static">
                     <!-- task name -->
-                    <input v-model="newName" class="font-semibold text-black text-2xl outline-0 w-2/3"
-                        :class="isMobile ? 'w-45' : ''">
+                    <input v-model="newName" class="font-semibold text-black text-2xl outline-0 w-45 md:w-2/3">
 
                     <!-- task priority on desktop -->
                     <div v-if="!isMobile" class="relative">
@@ -54,9 +54,9 @@
                             <font-awesome-icon v-if="task.editing" :icon="['fas', 'calendar-days']" />
                             <p class="w-xs" :class="task.editing ? '' : 'text-gray-500'">{{ task.date }}</p>
                         </div>
-                        <!-- resize on bigger text? -->
+
                         <textarea v-if="!isMobile || task.editing" v-model="newDesc"
-                            placeholder="Here goes the description." class=" w-90 outline-0 resize-none "
+                            placeholder="Here goes the description." class="outline-0 resize-none w-3/4 md:w-90"
                             :class="task.editing ? 'h-20' : 'h-7'"></textarea>
                     </div>
 
@@ -71,14 +71,13 @@
                     </button>
                 </div>
 
-                <div v-if="task.editing" @click.stop class="space-x-3">
+                <div v-if="task.editing" @click.stop class="space-x-3 font-semibold text-xs">
                     <button
                         @click="$emit('onSave', { id: task.id, newName: newName, newDesc: newDesc, newPriority: newPriority })"
-                        class="bg-emerald-400 text-white text-xs"
-                        :class="isMobile ? 'font-semibold rounded-lg p-2 w-15' : 'rounded-xl p-3 w-20'">Save</button>
+                        class="bg-emerald-400 text-white rounded-lg p-2 w-15 md:rounded-xl md:p-3 md:w-20">Save</button>
 
-                    <button @click="delPopupShowing = true" class="bg-gray-300 text-black text-xs w-20"
-                        :class="isMobile ? 'font-semibold rounded-lg p-2 w-15' : 'rounded-xl p-3 w-20'">Delete</button>
+                    <button @click="delPopupShowing = true"
+                        class="bg-gray-300 text-black rounded-lg p-2 w-15 md:rounded-xl md:p-3 md:w-20">Delete</button>
 
                     <!-- delete popup confirmation -->
                     <Popup v-if="delPopupShowing" :message="message" @confirmAction="handleDeleteConfirmation" />
