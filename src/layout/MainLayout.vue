@@ -6,9 +6,9 @@
             <img v-if="isEmpty" src="../assets/notodos.png" alt="NoTodos" class="max-w-xs mx-auto">
 
             <div v-else class="grid gap-8">
-                <TaskCard v-for="task in tasks" :key="task.id" :task="task" @done-clicked="handleDoneClicked"
-                    @edit-requested="handleEditRequested" @save-clicked="handleSaveClicked"
-                    @delete-clicked="handleDeleteClicked" @priority-chosen="handlePriorityChoosen" />
+                <TaskCard v-for="task in tasks" :key="task.id" :task="task" @onComplete="handleDoneClicked"
+                    @onEdit="handleEditRequested" @onSave="handleSaveClicked" @onDelete="handleDeleteClicked"
+                    @onPriorityModified="handlePriorityChoosen" />
             </div>
         </div>
 
@@ -55,12 +55,7 @@ function handleDoneClicked(id: number) {
 }
 
 function handleEditRequested(id: number) {
-    tasks.value.map(task => task.editing = false)
-    const task = tasks.value.find(task => task.id === id)
-    const realId = tasks.value.length - id
-    if (task) {
-        tasks.value.splice(realId, 1, { ...task, editing: true })
-    }
+    tasks.value.map(task => { task.id === id ? task.editing = true : task.editing = false })
 }
 
 function handleSaveClicked(payload: {
