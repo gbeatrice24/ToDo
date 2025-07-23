@@ -1,17 +1,20 @@
 <template>
-    <div class="p-4 rounded-2xl border-2 max-w-xs md:max-w-xl md:relative" @click="$emit('onEdit', task.id)">
+    <div class="p-4 rounded-2xl border-2 max-w-xs md:max-w-xl md:relative bg-white" @click="$emit('onEdit', task.id)">
         <!-- dim bg for priority dropdown -->
         <div v-if="!isMobile" class="absolute inset-0 bg-white rounded-2xl"
             :class="isPriorityDropdownVisible ? 'opacity-50' : 'invisible'"></div>
 
         <div class="flex items-center">
             <!--done button on phone-->
-            <button v-if="isMobile && !task.editing" @click="$emit('onComplete', task.id)" class="relative w-6 h-6">
+            <button v-if="isMobile && !task.editing" class="relative w-6 h-6"
+                @click.stop="$emit('onComplete', task.id)">
                 <img v-if="!task.done" src="../assets/CircleBlack.svg" />
-                <div v-else>
-                    <img class="absolute inset-0" src="../assets/CircleGreen.svg" />
-                    <img class="absolute inset-0" src="../assets/Checkmark.svg" />
-                </div>
+                <img v-else class="absolute inset-0" src="../assets/CircleGreen.svg" />
+
+                <!-- animated checkmark -->
+                <img class="absolute inset-0 transition-all duration-500 ease-out transform"
+                    :class="task.done ? 'opacity-100 scale-100' : 'opacity-0 scale-50'" src="../assets/Checkmark.svg" />
+
             </button>
 
             <!-- task info -->
@@ -55,6 +58,9 @@
                             <p class="w-xs" :class="task.editing ? '' : 'text-gray-500'">
                                 {{ task.date }}
                             </p>
+                            <p class="w-xs" :class="task.editing ? '' : 'text-gray-500'">
+                                {{ task.date }}
+                            </p>
                         </div>
 
                         <textarea v-if="!isMobile || task.editing" v-model="newDesc"
@@ -66,10 +72,13 @@
                     <button v-if="!isMobile && !task.editing" class="relative w-6 h-6 ml-auto"
                         @click.stop="$emit('onComplete', task.id)">
                         <img v-if="!task.done" src="../assets/CircleBlack.svg" />
-                        <div v-else>
-                            <img class="absolute inset-0" src="../assets/CircleGreen.svg" />
-                            <img class="absolute inset-0" src="../assets/Checkmark.svg" />
-                        </div>
+                        <img v-else class="absolute inset-0" src="../assets/CircleGreen.svg" />
+
+                        <!-- animated checkmark -->
+                        <img class="absolute inset-0 transition-all duration-500 ease-out transform"
+                            :class="task.done ? 'opacity-100 scale-100' : 'opacity-0 scale-50'"
+                            src="../assets/Checkmark.svg" />
+
                     </button>
                 </div>
 
@@ -179,6 +188,7 @@ function handleDeleteCancel() {
 
 function handleChoiceSelected(choice: string) {
     newPriority.value = choice;
+    isPriorityDropdownVisible.value = false;
     isPriorityDropdownVisible.value = false;
 }
 </script>
