@@ -31,8 +31,8 @@ function handleAddTask() {
 
     const task = {
         id: ++nextId,
-        name: `Task`,
-        desc: ``,
+        name: "Task",
+        desc: "",
         priority: "High",
         done: false,
         date: formatDate(new Date()),
@@ -44,10 +44,11 @@ function handleAddTask() {
 }
 
 function handleDoneClicked(id: number) {
-    const task = tasks.value.find((task) => task.id === id);
-    const realId = tasks.value.length - id;
-    if (task) {
-        tasks.value.splice(realId, 1, {
+    const index = tasks.value.findIndex(task => task.id === id);
+    if (index !== -1) {
+        const task = tasks.value[index]
+
+        tasks.value.splice(index, 1, {
             ...task,
             done: !task.done,
         });
@@ -69,11 +70,11 @@ function handleSaveClicked(payload: {
     newPriority: string;
 }) {
     const { id, newName, newDesc, newPriority } = payload;
-    const task = tasks.value.find((task) => task.id === id);
-    const realId = tasks.value.length - id;
+    const index = tasks.value.findIndex(task => task.id === id);
 
-    if (task) {
-        tasks.value.splice(realId, 1, {
+    if (index !== -1) {
+        const task = tasks.value[index]
+        tasks.value.splice(index, 1, {
             ...task,
             name: newName,
             desc: newDesc,
@@ -86,28 +87,22 @@ function handleSaveClicked(payload: {
 }
 
 function handleDeleteClicked(id: number) {
-    const task = tasks.value.find((task) => task.id === id);
-    const realId = tasks.value.length - id;
+    const index = tasks.value.findIndex(task => task.id === id);
 
-    console.log("before delete", [...tasks.value]);
-
-    if (task) {
-        tasks.value.splice(realId, 1);
+    if (index !== -1) {
+        console.log("Before delete", [...tasks.value]);
+        tasks.value.splice(index, 1);
+        console.log("After delete", [...tasks.value]);
     }
-
-    tasks.value.forEach((task) => (task.id > id ? task.id-- : ""));
-    nextId--;
-
-    console.log("after delete", tasks.value);
 }
 
 function handlePriorityChoosen(payload: { id: number; priority: string }) {
     const { id, priority } = payload;
-    const task = tasks.value.find((task) => task.id === id);
-    const realId = tasks.value.length - id;
+    const index = tasks.value.findIndex(task => task.id === id);
 
-    if (task) {
-        tasks.value.splice(realId, 1, { ...task, priority: priority });
+    if (index !== -1) {
+        const task = tasks.value[index]
+        tasks.value.splice(index, 1, { ...task, priority: priority });
         console.log("Task", id, "priority changed", priority);
     }
 }
@@ -147,9 +142,9 @@ const task1 = {
 tasks.value.unshift(task1);
 </script>
 
-<style>
+<style scoped>
 .list-move {
-    transition: transform 0.5s ease;
-    transition-delay: 250ms;
+    transition: transform 0.7s ease;
+    transition-delay: 300ms;
 }
 </style>
