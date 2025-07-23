@@ -57,7 +57,7 @@ function handleDoneClicked(id: number) {
 }
 
 function handleEditRequested(id: number) {
-    tasks.value.map(task => { task.id === id ? task.editing = true : task.editing = false })
+    tasks.value.map(task => { task.editing = task.id === id })
 }
 
 function handleSaveClicked(payload: {

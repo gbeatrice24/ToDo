@@ -29,8 +29,8 @@
                             {{ newPriority }}
 
                             <div v-if="task.editing">
-                                <img v-if="!isPriorityDropdownVisible" src="@/assets/ArrowDownWhite.svg"
-                                    class="w-3 pl-1" />
+                                <img v-if="!isPriorityDropdownVisible" class="w-3 pl-1"
+                                    src="@/assets/ArrowDownWhite.svg" />
                                 <img v-else class="w-3 pl-1" src="@/assets/ArrowDownBlack.svg" />
                             </div>
                         </button>
@@ -43,8 +43,8 @@
                     <!-- task priority on phone -> while being actively edited -->
                     <div v-if="isMobile && task.editing" class="flex flex-row order-3 space-x-2">
                         <button v-for="priority in priorities" :key="priority"
-                            class="rounded-full order-3 h-3 w-3 focus:outline-2" :class="getPriorityButtonBgColor(priority)"
-                            @click="newPriority = priority"></button>
+                            class="rounded-full order-3 h-3 w-3 focus:outline-2"
+                            :class="getPriorityButtonBgColor(priority)" @click="newPriority = priority"></button>
                     </div>
                 </div>
 
