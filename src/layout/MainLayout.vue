@@ -3,29 +3,27 @@
         <TodoHeader @add-task="handleAddTask" />
 
         <div class="flex justify-center items-center ">
-            <img v-if="isEmpty" src="../assets/notodos.png" alt="NoTodos" class="max-w-xs mx-auto">
-
+            <img v-if="isEmpty" class="max-w-xs mx-auto" src="../assets/NoTodos.png" alt="NoTodos">
             <div v-else class="grid gap-8">
                 <TaskCard v-for="task in tasks" :key="task.id" :task="task" @onComplete="handleDoneClicked"
                     @onEdit="handleEditRequested" @onSave="handleSaveClicked" @onDelete="handleDeleteClicked"
                     @onPriorityModified="handlePriorityChoosen" />
             </div>
         </div>
-
     </div>
 </template>
 
 <script setup lang="ts">
 import TodoHeader from './TodoHeader.vue';
 import TaskCard from '@/components/TaskCard.vue';
-
 import { Task } from '@/types/Task';
-
+import { formatDate } from '@/utils/format-date';
 import { ref, computed } from 'vue'
 
 
 const tasks = ref<Task[]>([])
 let nextId = 0
+
 const isEmpty = computed(() => tasks.value.length == 0)
 
 function handleAddTask() {
@@ -40,16 +38,20 @@ function handleAddTask() {
         date: formatDate(new Date()),
         editing: true
     })
-    tasks.value.unshift(task)
 
-    console.log('new task added:', task)
+    tasks.value.unshift(task)
+    console.log("new task added:", task)
 }
 
 function handleDoneClicked(id: number) {
     const task = tasks.value.find(task => task.id === id)
     const realId = tasks.value.length - id
     if (task) {
-        tasks.value.splice(realId, 1, { ...task, done: !task.done })
+        tasks.value.splice(realId, 1, {
+            ...task,
+            done: !task.done
+        })
+
         console.log("Task", id, "done modified")
     }
 }
@@ -67,43 +69,46 @@ function handleSaveClicked(payload: {
     const { id, newName, newDesc, newPriority } = payload;
     const task = tasks.value.find(task => task.id === id)
     const realId = tasks.value.length - id
+
     if (task) {
-        tasks.value.splice(realId, 1, { ...task, name: newName, desc: newDesc, priority: newPriority, editing: false })
+        tasks.value.splice(realId, 1, {
+            ...task,
+            name: newName,
+            desc: newDesc,
+            priority: newPriority,
+            editing: false
+        })
+
         console.log("Task", id, "changed", newName, newDesc, newPriority)
     }
 }
 
 function handleDeleteClicked(id: number) {
-    console.log(tasks.value)
-    const task = tasks.value.find(task => task.id === id)
-    const realId = tasks.value.length - id
+    const task = tasks.value.find(task => task.id === id);
+    const realId = tasks.value.length - id;
+
     if (task) {
-        tasks.value.splice(realId, 1)
+        tasks.value.splice(realId, 1);
     }
 
-    tasks.value.map(task => (task.id > id) ? task.id-- : '')
+    tasks.value.forEach(task => (task.id > id) ? task.id-- : '');
     nextId--;
 
-    console.log(tasks.value)
+    console.log(tasks.value);
 }
 
-function handlePriorityChoosen(payload: { id: number, prio: string }) {
-    const { id, prio } = payload;
+function handlePriorityChoosen(payload: {
+    id: number,
+    priority: string
+}) {
+    const { id, priority } = payload;
     const task = tasks.value.find(task => task.id === id)
     const realId = tasks.value.length - id
+
     if (task) {
-        tasks.value.splice(realId, 1, { ...task, priority: prio })
-        console.log("Task", id, "priority changed", prio)
+        tasks.value.splice(realId, 1, { ...task, priority: priority })
+        console.log("Task", id, "priority changed", priority)
     }
-}
-
-function formatDate(date: Date) {
-    const now = new Date();
-    const year = String(now.getFullYear()).slice(-2);
-    const month = String(now.getMonth() + 1).padStart(2, '0');
-    const day = String(now.getDate()).padStart(2, '0');
-
-    return `${year}.${month}.${day}`
 }
 
 //////// TEST /////////

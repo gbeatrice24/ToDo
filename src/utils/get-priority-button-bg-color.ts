@@ -1,4 +1,4 @@
-export function getBgColor(priority: string): string {
+export function getPriorityButtonBgColor(priority: string): string {
     switch (priority) {
         case 'High':
             return 'bg-red-500'
@@ -10,6 +10,3 @@ export function getBgColor(priority: string): string {
             return 'bg-gray-500'
     }
 }
-
-
-
