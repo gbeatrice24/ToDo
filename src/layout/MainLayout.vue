@@ -49,6 +49,8 @@ function sortArray(array: Task[]) {
     switch (sortBy.value) {
         case "title":
             array.sort((a, b) => a.name.localeCompare(b.name))
+        case "description":
+            array.sort((a, b) => a.desc.localeCompare(b.desc))
     }
 }
 

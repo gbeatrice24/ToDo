@@ -2,17 +2,13 @@
     <div class="flex justify-center items-center">
         <div class="flex flex-col space-y-4 md:flex-row font-semibold md:w-lg justify-between">
             <div class="space-x-3">
-                <button 
-                    class="bg-emerald-400 text-xs text-white pl-3 pr-3 h-8 rounded-md"
+                <button class="bg-emerald-400 text-xs text-white pl-3 pr-3 h-8 rounded-md"
                     @click="$emit('onSort', 'title')">Title</button>
-                <button 
-                    class="bg-black text-xs text-white pl-3 pr-3 h-8 rounded-md"
+                <button class="bg-black text-xs text-white pl-3 pr-3 h-8 rounded-md"
                     @click="$emit('onSort', 'description')">Description</button>
-                <button 
-                    class="bg-white text-xs text-black border pl-3 pr-3 h-8 rounded-md"
+                <button class="bg-white text-xs text-black border pl-3 pr-3 h-8 rounded-md"
                     @click="$emit('onSort', 'priority')">Priority</button>
-                <button 
-                    class="bg-white text-xs text-black border pl-3 pr-3 h-8 rounded-md"
+                <button class="bg-white text-xs text-black border pl-3 pr-3 h-8 rounded-md"
                     @click="$emit('onSort', 'date')">Date</button>
             </div>
 
