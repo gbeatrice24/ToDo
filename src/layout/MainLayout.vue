@@ -1,11 +1,13 @@
 <template>
-    <div class="min-h-screen space-y-15">
-        <TodoHeader @add-task="handleAddTask" />
+    <div class="min-h-screen space-y-10">
+        <TodoHeader @onAddTask="handleAddTask" />
+
+        <SearchTodo @onSearch="handleSearch" />
 
         <div class="flex justify-center items-center">
             <img v-if="isEmpty" class="max-w-xs mx-auto" src="../assets/NoTodos.png" alt="NoTodos" />
             <TransitionGroup tag="div" class="flex flex-col gap-8" name="list">
-                <TaskCard v-for="task in tasks" :key="task.id" :task="task"
+                <TaskCard v-for="task in filteredTasks" :key="task.id" :task="task"
                     :class="task.done === true ? 'order-last' : 'order-first'" @onComplete="handleDoneClicked"
                     @onEdit="handleEditRequested" @onSave="handleSaveClicked" @onDelete="handleDeleteClicked"
                     @onPriorityModified="handlePriorityChoosen" />
@@ -15,6 +17,7 @@
 </template>
 
 <script setup lang="ts">
+import SearchTodo from "@/components/SearchTodo.vue";
 import TodoHeader from "./TodoHeader.vue";
 import TaskCard from "@/components/TaskCard.vue";
 import { Task } from "@/types/Task";
@@ -23,8 +26,15 @@ import { ref, computed } from "vue";
 
 const tasks = ref<Task[]>([]);
 let nextId = 0;
+const querySearch = ref("")
 
-const isEmpty = computed(() => tasks.value.length == 0);
+const isEmpty = computed(() => tasks.value.length == 0)
+
+
+const filteredTasks = computed(() =>
+    tasks.value.filter((task) =>
+        task.name.toLowerCase().includes(querySearch.value.toLowerCase()) ||
+        task.desc.toLowerCase().includes(querySearch.value.toLowerCase())))
 
 function handleAddTask() {
     tasks.value.map((task) => (task.editing = false));
@@ -105,6 +115,10 @@ function handlePriorityChoosen(payload: { id: number; priority: string }) {
         tasks.value.splice(index, 1, { ...task, priority: priority });
         console.log("Task", id, "priority changed", priority);
     }
+}
+
+function handleSearch(search: string) {
+    querySearch.value = search
 }
 
 //////// TEST /////////
