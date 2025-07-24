@@ -4,7 +4,7 @@
 
         <SearchTodo v-if="!isEmpty" @onSearch="handleSearch" />
 
-        <FilterTodos />
+        <FilterTodos @onSort="handleSort" />
 
         <div class="flex justify-center items-center">
             <img v-if="isEmpty" class="" src="../assets/NoTodos.svg" alt="NoTodos" />
@@ -24,18 +24,33 @@ import TodoHeader from "./TodoHeader.vue";
 import TaskCard from "@/components/TaskCard.vue";
 import { Task } from "@/types/Task";
 import { formatDate } from "@/utils/format-date";
-import { ref, computed } from "vue";
+import { Ref, ref, computed } from "vue";
 import FilterTodos from "@/components/FilterTodos.vue";
 
 const tasks = ref<Task[]>([]);
 const querySearch = ref("")
+const sortBy = ref("")
 
 const nextId = computed(() => tasks.value.length)
 const isEmpty = computed(() => tasks.value.length == 0)
-const filteredTasks = computed(() =>
-    tasks.value.filter((task) =>
+
+
+const filteredTasks = computed(() => {
+    let result = tasks.value.filter((task) =>
         task.name.toLowerCase().includes(querySearch.value.toLowerCase()) ||
-        task.desc.toLowerCase().includes(querySearch.value.toLowerCase())))
+        task.desc.toLowerCase().includes(querySearch.value.toLowerCase()))
+
+    sortArray(result);
+
+    return result
+})
+
+function sortArray(array: Task[]) {
+    switch (sortBy.value) {
+        case "title":
+            array.sort((a, b) => a.name.localeCompare(b.name))
+    }
+}
 
 function handleAddTask() {
     tasks.value.map((task) => (task.editing = false));
@@ -120,6 +135,10 @@ function handlePriorityChoosen(payload: { id: number; priority: string }) {
 
 function handleSearch(search: string) {
     querySearch.value = search
+}
+
+function handleSort(by: string) {
+    sortBy.value = by
 }
 
 //////// TEST /////////

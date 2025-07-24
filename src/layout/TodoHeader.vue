@@ -12,9 +12,7 @@
 </template>
 
 <script setup lang="ts">
-import { useWindowSize } from '@vueuse/core'
 
 defineEmits(['onAddTask'])
 
-const { width } = useWindowSize()
 </script>
