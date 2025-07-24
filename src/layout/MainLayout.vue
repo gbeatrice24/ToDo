@@ -4,7 +4,9 @@
 
         <SearchTodo v-if="!isEmpty" @onSearch="handleSearch" />
 
-        <div class="flex justify-center items-center">
+        <FilterTodos />
+
+        <div class="flex justify-center items-center bg-red-400">
             <img v-if="isEmpty" class="" src="../assets/NoTodos.svg" alt="NoTodos" />
             <TransitionGroup tag="div" class="flex flex-col gap-8" name="list">
                 <TaskCard v-for="task in filteredTasks" :key="task.id" :task="task"
@@ -23,6 +25,7 @@ import TaskCard from "@/components/TaskCard.vue";
 import { Task } from "@/types/Task";
 import { formatDate } from "@/utils/format-date";
 import { ref, computed } from "vue";
+import FilterTodos from "@/components/FilterTodos.vue";
 
 const tasks = ref<Task[]>([]);
 const querySearch = ref("")

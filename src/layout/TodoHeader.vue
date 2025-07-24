@@ -13,10 +13,8 @@
 
 <script setup lang="ts">
 import { useWindowSize } from '@vueuse/core'
-import { computed } from 'vue'
 
 defineEmits(['onAddTask'])
 
 const { width } = useWindowSize()
-const isMobile = computed(() => width.value < 768)
 </script>

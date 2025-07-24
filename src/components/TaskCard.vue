@@ -1,5 +1,5 @@
 <template>
-    <div class="p-4 rounded-2xl border-2 max-w-xs md:max-w-xl md:relative bg-white" @click="$emit('onEdit', task.id)">
+    <div class="p-4 rounded-2xl border-2 w-xs md:w-lg md:relative bg-white" @click="$emit('onEdit', task.id)">
         <!-- dim bg for priority dropdown -->
         <div v-if="!isMobile" class="absolute inset-0 bg-white rounded-2xl"
             :class="isPriorityDropdownVisible ? 'opacity-50' : 'invisible'"></div>
@@ -114,7 +114,7 @@ import { getPriorityButtonBgColor } from "@/utils/get-priority-button-bg-color";
 import { useWindowSize } from "@vueuse/core";
 import { ref, computed, watch } from "vue";
 
-import { faCalendarDays, faL } from "@fortawesome/free-solid-svg-icons";
+import { faCalendarDays } from "@fortawesome/free-solid-svg-icons";
 import { library } from "@fortawesome/fontawesome-svg-core";
 import Popup from "./Popup.vue";
 import Dropdown from "./Dropdown.vue";
