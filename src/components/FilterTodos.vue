@@ -13,10 +13,10 @@
             </div>
 
             <div class="space-x-2">
-                <button class="bg-emerald-400 text-xs text-white w-8 h-8 rounded-md"><font-awesome-icon
-                        :icon="['fas', 'arrow-up']" /></button>
-                <button class="bg-black text-xs text-white w-8 h-8 rounded-md"><font-awesome-icon
-                        :icon="['fas', 'arrow-down']" /></button>
+                <button class="bg-emerald-400 text-xs text-white w-8 h-8 rounded-md"
+                    @click="$emit('onOrder', 'ascending')"><font-awesome-icon :icon="['fas', 'arrow-up']" /></button>
+                <button class="bg-black text-xs text-white w-8 h-8 rounded-md"
+                    @click="$emit('onOrder', 'descending')"><font-awesome-icon :icon="['fas', 'arrow-down']" /></button>
             </div>
         </div>
     </div>

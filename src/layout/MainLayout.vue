@@ -4,7 +4,7 @@
 
         <SearchTodo v-if="!isEmpty" @onSearch="handleSearch" />
 
-        <FilterTodos @onSort="handleSort" />
+        <FilterTodos @onSort="handleSort" @onOrder="handleOrder" />
 
         <div class="flex justify-center items-center">
             <img v-if="isEmpty" class="" src="../assets/NoTodos.svg" alt="NoTodos" />
@@ -24,12 +24,13 @@ import TodoHeader from "./TodoHeader.vue";
 import TaskCard from "@/components/TaskCard.vue";
 import { Task } from "@/types/Task";
 import { formatDate } from "@/utils/format-date";
-import { Ref, ref, computed } from "vue";
+import { ref, computed } from "vue";
 import FilterTodos from "@/components/FilterTodos.vue";
 
 const tasks = ref<Task[]>([]);
 const querySearch = ref("")
 const sortBy = ref("")
+const orderBy = ref("")
 
 const nextId = computed(() => tasks.value.length)
 const isEmpty = computed(() => tasks.value.length == 0)
@@ -49,9 +50,38 @@ function sortArray(array: Task[]) {
     switch (sortBy.value) {
         case "title":
             array.sort((a, b) => a.name.localeCompare(b.name))
+            break;
         case "description":
             array.sort((a, b) => a.desc.localeCompare(b.desc))
+            break;
+        case "priority":
+            array.sort((a, b) => {
+                const priorityA = a.priority
+                const priorityB = b.priority
+
+                if (priorityA === "High" && priorityB !== "High") {
+                    return 1
+                }
+                if (priorityA === "Medium" && priorityB === "Low") {
+                    return 1
+                }
+                if (priorityA === priorityB) {
+                    return 0
+                }
+
+                return -1
+            })
+            break;
     }
+
+
+
+    if (orderBy.value === "descending") {
+        console.log("orderby:", orderBy.value)
+        array.reverse()
+    }
+
+
 }
 
 function handleAddTask() {
@@ -141,6 +171,10 @@ function handleSearch(search: string) {
 
 function handleSort(by: string) {
     sortBy.value = by
+}
+
+function handleOrder(order: string) {
+    orderBy.value = order
 }
 
 //////// TEST /////////
