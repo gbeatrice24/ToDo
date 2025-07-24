@@ -2,10 +2,10 @@
     <div class="min-h-screen space-y-10">
         <TodoHeader @onAddTask="handleAddTask" />
 
-        <SearchTodo @onSearch="handleSearch" />
+        <SearchTodo v-if="!isEmpty" @onSearch="handleSearch" />
 
         <div class="flex justify-center items-center">
-            <img v-if="isEmpty" class="max-w-xs mx-auto" src="../assets/NoTodos.png" alt="NoTodos" />
+            <img v-if="isEmpty" class="" src="../assets/NoTodos.svg" alt="NoTodos" />
             <TransitionGroup tag="div" class="flex flex-col gap-8" name="list">
                 <TaskCard v-for="task in filteredTasks" :key="task.id" :task="task"
                     :class="task.done === true ? 'order-last' : 'order-first'" @onComplete="handleDoneClicked"
