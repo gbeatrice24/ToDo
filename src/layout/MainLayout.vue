@@ -6,7 +6,7 @@
 
         <FilterTodos />
 
-        <div class="flex justify-center items-center bg-red-400">
+        <div class="flex justify-center items-center">
             <img v-if="isEmpty" class="" src="../assets/NoTodos.svg" alt="NoTodos" />
             <TransitionGroup tag="div" class="flex flex-col gap-8" name="list">
                 <TaskCard v-for="task in filteredTasks" :key="task.id" :task="task"

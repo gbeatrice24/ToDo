@@ -1,6 +1,6 @@
 <template>
     <div class="flex justify-center items-center">
-        <div class="flex font-semibold w-lg justify-between">
+        <div class="flex flex-col space-y-4 md:flex-row font-semibold md:w-lg justify-between">
             <div class="space-x-3">
                 <button class="bg-emerald-400 text-xs text-white pl-3 pr-3 h-8 rounded-md">Title</button>
                 <button class="bg-black text-xs text-white pl-3 pr-3 h-8 rounded-md">Description</button>
