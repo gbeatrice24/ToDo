@@ -5,4 +5,5 @@ export interface Task {
   priority: string
   done: boolean
   date: string
+  editing: boolean
 }

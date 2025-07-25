@@ -3,83 +3,145 @@
         <TodoHeader @add-task="handleAddTask" />
 
         <div class="flex justify-center items-center ">
-            <img v-if="isEmpty" src="../assets/notodos.png" alt="NoTodos" class="max-w-xs mx-auto">
-
+            <img v-if="isEmpty" class="max-w-xs mx-auto" src="../assets/NoTodos.png" alt="NoTodos">
             <div v-else class="grid gap-8">
-                <TaskCard v-for="task in tasks" :key="task.id" :task="task" @done-clicked="handleDoneClicked" />
+                <TaskCard v-for="task in tasks" :key="task.id" :task="task" @onComplete="handleDoneClicked"
+                    @onEdit="handleEditRequested" @onSave="handleSaveClicked" @onDelete="handleDeleteClicked"
+                    @onPriorityModified="handlePriorityChoosen" />
             </div>
         </div>
-
     </div>
 </template>
 
 <script setup lang="ts">
 import TodoHeader from './TodoHeader.vue';
 import TaskCard from '@/components/TaskCard.vue';
-
 import { Task } from '@/types/Task';
-
+import { formatDate } from '@/utils/format-date';
 import { ref, computed } from 'vue'
 
 
 const tasks = ref<Task[]>([])
 let nextId = 0
+
 const isEmpty = computed(() => tasks.value.length == 0)
 
 function handleAddTask() {
+    tasks.value.map(task => task.editing = false)
+
     const task = ({
         id: ++nextId,
-        name: `Task ${nextId}`,
-        desc: `This is a description`,
+        name: `Task`,
+        desc: ``,
         priority: 'High',
         done: false,
-        date: new Date().toLocaleDateString(),
+        date: formatDate(new Date()),
+        editing: true
     })
-    tasks.value.push(task)
 
-    console.log('new task added:', task)
+    tasks.value.unshift(task)
+    console.log("new task added:", task)
 }
 
 function handleDoneClicked(id: number) {
     const task = tasks.value.find(task => task.id === id)
+    const realId = tasks.value.length - id
     if (task) {
-        tasks.value.splice(id - 1, 1, { ...task, done: !task.done })
+        tasks.value.splice(realId, 1, {
+            ...task,
+            done: !task.done
+        })
+
         console.log("Task", id, "done modified")
     }
 }
 
+function handleEditRequested(id: number) {
+    tasks.value.map(task => { task.editing = task.id === id })
+}
 
+function handleSaveClicked(payload: {
+    id: number,
+    newName: string,
+    newDesc: string,
+    newPriority: string,
+}) {
+    const { id, newName, newDesc, newPriority } = payload;
+    const task = tasks.value.find(task => task.id === id)
+    const realId = tasks.value.length - id
+
+    if (task) {
+        tasks.value.splice(realId, 1, {
+            ...task,
+            name: newName,
+            desc: newDesc,
+            priority: newPriority,
+            editing: false
+        })
+
+        console.log("Task", id, "changed", newName, newDesc, newPriority)
+    }
+}
+
+function handleDeleteClicked(id: number) {
+    const task = tasks.value.find(task => task.id === id);
+    const realId = tasks.value.length - id;
+
+    if (task) {
+        tasks.value.splice(realId, 1);
+    }
+
+    tasks.value.forEach(task => (task.id > id) ? task.id-- : '');
+    nextId--;
+
+    console.log(tasks.value);
+}
+
+function handlePriorityChoosen(payload: {
+    id: number,
+    priority: string
+}) {
+    const { id, priority } = payload;
+    const task = tasks.value.find(task => task.id === id)
+    const realId = tasks.value.length - id
+
+    if (task) {
+        tasks.value.splice(realId, 1, { ...task, priority: priority })
+        console.log("Task", id, "priority changed", priority)
+    }
+}
 
 //////// TEST /////////
-const task1 = ({
+const task3 = ({
     id: ++nextId,
-    name: `Task ${nextId}`,
-    desc: `This is a description`,
-    priority: 'High',
+    name: `Task`,
+    desc: ``,
+    priority: 'Low',
     done: false,
-    date: new Date().toLocaleDateString(),
+    date: formatDate(new Date()),
+    editing: false
 })
-tasks.value.push(task1)
+tasks.value.unshift(task3)
 
 const task2 = ({
     id: ++nextId,
-    name: `Task ${nextId}`,
-    desc: `This is a description`,
+    name: `Task`,
+    desc: ``,
     priority: 'Medium',
     done: false,
-    date: new Date().toLocaleDateString(),
+    date: formatDate(new Date()),
+    editing: false
 })
-tasks.value.push(task2)
+tasks.value.unshift(task2)
 
-const task3 = ({
+const task1 = ({
     id: ++nextId,
-    name: `Task ${nextId}`,
-    desc: `This is a description`,
-    priority: 'Low',
+    name: `Task`,
+    desc: ``,
+    priority: 'High',
     done: false,
-    date: new Date().toLocaleDateString(),
+    date: formatDate(new Date()),
+    editing: true
 })
-tasks.value.push(task3)
-
-
+tasks.value.unshift(task1)
 </script>
