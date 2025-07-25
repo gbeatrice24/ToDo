@@ -92,7 +92,7 @@ function handleAddTask() {
     tasks.value.map((task) => (task.editing = false));
 
     const task = {
-        id: ++nextId,
+        id: nextId.value,
         name: "",
         desc: "",
         priority: "Priority",
@@ -183,7 +183,7 @@ function handleOrder(order: boolean) {
 
 //////// TEST /////////
 const task3 = {
-    id: ++nextId,
+    id: nextId.value,
     name: `a This is the first title`,
     desc: `b This is the second description, lastest date`,
     priority: "Low",
@@ -194,7 +194,7 @@ const task3 = {
 tasks.value.unshift(task3);
 
 const task2 = {
-    id: ++nextId,
+    id: nextId.value,
     name: `c This is the third title`,
     desc: `a This is the first description second date`,
     priority: "Medium",
@@ -205,7 +205,7 @@ const task2 = {
 tasks.value.unshift(task2);
 
 const task1 = {
-    id: ++nextId,
+    id: nextId.value,
     name: `b This is the second title`,
     desc: `c This is the last description, the newest date`,
     priority: "High",
