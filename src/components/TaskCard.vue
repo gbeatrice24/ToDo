@@ -189,6 +189,5 @@ function handleDeleteCancel() {
 function handleChoiceSelected(choice: string) {
     newPriority.value = choice;
     isPriorityDropdownVisible.value = false;
-    isPriorityDropdownVisible.value = false;
 }
 </script>
