@@ -1,7 +1,7 @@
 <template>
     <div class="flex justify-center items-center pt-10 max-w-screen">
-        <div class="flex items-center space-x-35">
-            <h1 class="font-semibold text-black text-5xl md:text-6xl">To do list</h1>
+        <div class="flex items-center w-xs md:w-lg justify-between">
+            <h1 class="font-semibold text-black text-3xl md:text-6xl">To do list</h1>
             <button
                 class="flex items-center justify-center bg-emerald-400 text-white rounded-full w-10 h-10 md:w-12 md:h-12"
                 @click="$emit('onAddTask')">

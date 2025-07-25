@@ -1,12 +1,12 @@
 <template>
-    <div class="min-h-screen space-y-10">
+    <div class="min-h-screen space-y-5">
         <TodoHeader @onAddTask="handleAddTask" />
 
         <SearchTodo v-if="!isEmpty" @onSearch="handleSearch" />
 
         <FilterTodos @onSort="handleSort" @onOrder="handleOrder" />
 
-        <div class="flex justify-center items-center">
+        <div class="flex justify-center items-center ">
             <img v-if="isEmpty" class="" src="../assets/NoTodos.svg" alt="NoTodos" />
             <TransitionGroup tag="div" class="flex flex-col gap-8" name="list">
                 <TaskCard v-for="task in filteredTasks" :key="task.id" :task="task"
@@ -28,7 +28,7 @@ import FilterTodos from "@/components/FilterTodos.vue";
 
 const tasks = ref<Task[]>([]);
 const querySearch = ref("")
-const sortBy = ref("")
+const sortBy = ref("Title")
 const ascending = ref(true)
 
 const nextId = computed(() => tasks.value.length)
@@ -42,7 +42,10 @@ const filteredTasks = computed(() => {
 
     sortArray(result);
 
-    return result
+    const editing = result.filter(task => task.editing);
+    const others = result.filter(task => !task.editing);
+
+    return [...editing, ...others];
 })
 
 function sortArray(array: Task[]) {
@@ -89,10 +92,10 @@ function handleAddTask() {
     tasks.value.map((task) => (task.editing = false));
 
     const task = {
-        id: nextId.value,
-        name: "Task",
+        id: ++nextId,
+        name: "",
         desc: "",
-        priority: "High",
+        priority: "Priority",
         done: false,
         date: new Date(),
         editing: true,

@@ -1,8 +1,9 @@
 <template>
     <div class="flex justify-center items-center">
-        <div class="flex flex-col space-y-4 md:flex-row font-semibold md:w-lg justify-between">
-            <div class="space-x-3">
-                <button v-for="by in sortBy" :key="by.label" class="border pl-3 pr-3 h-8 rounded-md"
+        <div class="flex flex-col space-y-4 w-xs md:flex-row font-semibold md:w-lg justify-between">
+            <div class="flex space-x-3 justify-between">
+                <button v-for="by in sortBy" :key="by.label"
+                    class="border pl-3 pr-3 h-8 rounded-md text-xs md:text-base"
                     :class="by.active ? 'bg-emerald-400 text-white' : 'bg-white text-black'"
                     @click="$emit('onSort', by.label); resetButtons(by.label);">
                     {{ by.label }}
@@ -28,8 +29,6 @@ import { library } from '@fortawesome/fontawesome-svg-core'
 import { faArrowUp, faArrowDown } from '@fortawesome/free-solid-svg-icons'
 
 library.add(faArrowUp, faArrowDown)
-
-// v modellel?
 
 const emit = defineEmits<{
     (e: "onSort", sortBy: string): void,
