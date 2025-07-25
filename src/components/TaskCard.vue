@@ -21,7 +21,7 @@
             <div class="order-2 pl-2 w-7/8 md:'order-1 md:w-1/1">
                 <div class="flex flex-row space-x-10 static justify-between">
                     <!-- task name -->
-                    <input v-model="newName" placeholder="Here goes the title."
+                    <input v-model="newName" placeholder="Title"
                         class="font-semibold text-black text-2xl outline-0 w-45 md:w-2/3" />
 
                     <!-- task priority on desktop -->
