@@ -1,11 +1,13 @@
 <template>
-    <div class="min-h-screen space-y-15">
-        <TodoHeader @add-task="handleAddTask" />
+    <div class="min-h-screen space-y-10">
+        <TodoHeader @onAddTask="handleAddTask" />
+
+        <SearchTodo v-if="!isEmpty" @onSearch="handleSearch" />
 
         <div class="flex justify-center items-center">
-            <img v-if="isEmpty" class="max-w-xs mx-auto" src="../assets/NoTodos.png" alt="NoTodos" />
+            <img v-if="isEmpty" class="" src="../assets/NoTodos.svg" alt="NoTodos" />
             <TransitionGroup tag="div" class="flex flex-col gap-8" name="list">
-                <TaskCard v-for="task in tasks" :key="task.id" :task="task"
+                <TaskCard v-for="task in filteredTasks" :key="task.id" :task="task"
                     :class="task.done === true ? 'order-last' : 'order-first'" @onComplete="handleDoneClicked"
                     @onEdit="handleEditRequested" @onSave="handleSaveClicked" @onDelete="handleDeleteClicked"
                     @onPriorityModified="handlePriorityChoosen" />
@@ -15,6 +17,7 @@
 </template>
 
 <script setup lang="ts">
+import SearchTodo from "@/components/SearchTodo.vue";
 import TodoHeader from "./TodoHeader.vue";
 import TaskCard from "@/components/TaskCard.vue";
 import { Task } from "@/types/Task";
@@ -22,15 +25,20 @@ import { formatDate } from "@/utils/format-date";
 import { ref, computed } from "vue";
 
 const tasks = ref<Task[]>([]);
-let nextId = 0;
+const querySearch = ref("")
 
-const isEmpty = computed(() => tasks.value.length == 0);
+const nextId = computed(() => tasks.value.length)
+const isEmpty = computed(() => tasks.value.length == 0)
+const filteredTasks = computed(() =>
+    tasks.value.filter((task) =>
+        task.name.toLowerCase().includes(querySearch.value.toLowerCase()) ||
+        task.desc.toLowerCase().includes(querySearch.value.toLowerCase())))
 
 function handleAddTask() {
     tasks.value.map((task) => (task.editing = false));
 
     const task = {
-        id: ++nextId,
+        id: nextId.value,
         name: "Task",
         desc: "",
         priority: "High",
@@ -107,9 +115,13 @@ function handlePriorityChoosen(payload: { id: number; priority: string }) {
     }
 }
 
+function handleSearch(search: string) {
+    querySearch.value = search
+}
+
 //////// TEST /////////
 const task3 = {
-    id: ++nextId,
+    id: nextId.value,
     name: `Task`,
     desc: ``,
     priority: "Low",
@@ -120,7 +132,7 @@ const task3 = {
 tasks.value.unshift(task3);
 
 const task2 = {
-    id: ++nextId,
+    id: nextId.value,
     name: `Task`,
     desc: ``,
     priority: "Medium",
@@ -131,7 +143,7 @@ const task2 = {
 tasks.value.unshift(task2);
 
 const task1 = {
-    id: ++nextId,
+    id: nextId.value,
     name: `Task`,
     desc: ``,
     priority: "High",
