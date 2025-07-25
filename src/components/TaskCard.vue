@@ -56,7 +56,7 @@
                         <div v-if="isMobile" class="flex flex-row space-x-2 content-center">
                             <font-awesome-icon v-if="task.editing" :icon="['fas', 'calendar-days']" />
                             <p class="w-xs" :class="task.editing ? '' : 'text-gray-500'">
-                                {{ task.date }}
+                                {{ formatDate(task.date) }}
                             </p>
                         </div>
 
@@ -111,6 +111,7 @@
 <script setup lang="ts">
 import { Task } from "@/types/Task";
 import { getPriorityButtonBgColor } from "@/utils/get-priority-button-bg-color";
+import { formatDate } from "@/utils/format-date";
 import { useWindowSize } from "@vueuse/core";
 import { ref, computed, watch } from "vue";
 

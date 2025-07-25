@@ -23,14 +23,13 @@ import SearchTodo from "@/components/SearchTodo.vue";
 import TodoHeader from "./TodoHeader.vue";
 import TaskCard from "@/components/TaskCard.vue";
 import { Task } from "@/types/Task";
-import { formatDate } from "@/utils/format-date";
 import { ref, computed } from "vue";
 import FilterTodos from "@/components/FilterTodos.vue";
 
 const tasks = ref<Task[]>([]);
 const querySearch = ref("")
 const sortBy = ref("")
-const orderBy = ref("")
+const ascending = ref(true)
 
 const nextId = computed(() => tasks.value.length)
 const isEmpty = computed(() => tasks.value.length == 0)
@@ -72,12 +71,14 @@ function sortArray(array: Task[]) {
                 return -1
             })
             break;
+        case "Date":
+            array.sort((task1, task2) => task1.date.getTime() - task2.date.getTime())
+            break;
     }
 
 
 
-    if (orderBy.value === "descending") {
-        console.log("orderby:", orderBy.value)
+    if (!ascending.value) {
         array.reverse()
     }
 
@@ -93,7 +94,7 @@ function handleAddTask() {
         desc: "",
         priority: "High",
         done: false,
-        date: formatDate(new Date()),
+        date: new Date(),
         editing: true,
     };
 
@@ -173,40 +174,40 @@ function handleSort(by: string) {
     sortBy.value = by
 }
 
-function handleOrder(order: string) {
-    orderBy.value = order
+function handleOrder(order: boolean) {
+    ascending.value = order
 }
 
 //////// TEST /////////
 const task3 = {
-    id: nextId.value,
-    name: `Task`,
-    desc: ``,
+    id: ++nextId,
+    name: `a This is the first title`,
+    desc: `b This is the second description, lastest date`,
     priority: "Low",
     done: false,
-    date: formatDate(new Date()),
+    date: new Date("2023-01-01"),
     editing: false,
 };
 tasks.value.unshift(task3);
 
 const task2 = {
-    id: nextId.value,
-    name: `Task`,
-    desc: ``,
+    id: ++nextId,
+    name: `c This is the third title`,
+    desc: `a This is the first description second date`,
     priority: "Medium",
     done: false,
-    date: formatDate(new Date()),
+    date: new Date("2024-01-01"),
     editing: false,
 };
 tasks.value.unshift(task2);
 
 const task1 = {
-    id: nextId.value,
-    name: `Task`,
-    desc: ``,
+    id: ++nextId,
+    name: `b This is the second title`,
+    desc: `c This is the last description, the newest date`,
     priority: "High",
     done: false,
-    date: formatDate(new Date()),
+    date: new Date("2025-01-01"),
     editing: false,
 };
 tasks.value.unshift(task1);
