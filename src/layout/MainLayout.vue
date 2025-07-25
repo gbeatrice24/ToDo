@@ -25,12 +25,10 @@ import { formatDate } from "@/utils/format-date";
 import { ref, computed } from "vue";
 
 const tasks = ref<Task[]>([]);
-let nextId = 0;
 const querySearch = ref("")
 
+const nextId = computed(() => tasks.value.length)
 const isEmpty = computed(() => tasks.value.length == 0)
-
-
 const filteredTasks = computed(() =>
     tasks.value.filter((task) =>
         task.name.toLowerCase().includes(querySearch.value.toLowerCase()) ||
@@ -40,7 +38,7 @@ function handleAddTask() {
     tasks.value.map((task) => (task.editing = false));
 
     const task = {
-        id: ++nextId,
+        id: nextId.value,
         name: "Task",
         desc: "",
         priority: "High",
@@ -123,7 +121,7 @@ function handleSearch(search: string) {
 
 //////// TEST /////////
 const task3 = {
-    id: ++nextId,
+    id: nextId.value,
     name: `Task`,
     desc: ``,
     priority: "Low",
@@ -134,7 +132,7 @@ const task3 = {
 tasks.value.unshift(task3);
 
 const task2 = {
-    id: ++nextId,
+    id: nextId.value,
     name: `Task`,
     desc: ``,
     priority: "Medium",
@@ -145,7 +143,7 @@ const task2 = {
 tasks.value.unshift(task2);
 
 const task1 = {
-    id: ++nextId,
+    id: nextId.value,
     name: `Task`,
     desc: ``,
     priority: "High",

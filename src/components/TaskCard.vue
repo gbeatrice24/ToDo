@@ -58,9 +58,6 @@
                             <p class="w-xs" :class="task.editing ? '' : 'text-gray-500'">
                                 {{ task.date }}
                             </p>
-                            <p class="w-xs" :class="task.editing ? '' : 'text-gray-500'">
-                                {{ task.date }}
-                            </p>
                         </div>
 
                         <textarea v-if="!isMobile || task.editing" v-model="newDesc"
