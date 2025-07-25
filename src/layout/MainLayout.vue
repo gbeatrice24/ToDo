@@ -48,16 +48,16 @@ const filteredTasks = computed(() => {
 
 function sortArray(array: Task[]) {
     switch (sortBy.value) {
-        case "title":
-            array.sort((a, b) => a.name.localeCompare(b.name))
+        case "Title":
+            array.sort((task1, task2) => task1.name.localeCompare(task2.name))
             break;
-        case "description":
-            array.sort((a, b) => a.desc.localeCompare(b.desc))
+        case "Description":
+            array.sort((task1, task2) => task1.desc.localeCompare(task2.desc))
             break;
-        case "priority":
-            array.sort((a, b) => {
-                const priorityA = a.priority
-                const priorityB = b.priority
+        case "Priority":
+            array.sort((task1, task2) => {
+                const priorityA = task1.priority
+                const priorityB = task2.priority
 
                 if (priorityA === "High" && priorityB !== "High") {
                     return 1
