@@ -184,8 +184,8 @@ function handleOrder(order: boolean) {
 //////// TEST /////////
 const task3 = {
     id: nextId.value,
-    name: `a This is the first title`,
-    desc: `b This is the second description, lastest date`,
+    name: "a This is the first title",
+    desc: "b This is the second description, lastest date",
     priority: "Low",
     done: false,
     date: new Date("2023-01-01"),
@@ -195,8 +195,8 @@ tasks.value.unshift(task3);
 
 const task2 = {
     id: nextId.value,
-    name: `c This is the third title`,
-    desc: `a This is the first description second date`,
+    name: "c This is the third title",
+    desc: "a This is the first description second date",
     priority: "Medium",
     done: false,
     date: new Date("2024-01-01"),
@@ -206,8 +206,8 @@ tasks.value.unshift(task2);
 
 const task1 = {
     id: nextId.value,
-    name: `b This is the second title`,
-    desc: `c This is the last description, the newest date`,
+    name: "b This is the second title",
+    desc: "c This is the last description, the newest date",
     priority: "High",
     done: false,
     date: new Date("2025-01-01"),
