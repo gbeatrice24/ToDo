@@ -110,7 +110,7 @@
 </template>
 
 <script setup lang="ts">
-import { Task } from "@/types/Task";
+import { Task } from "@/types/task";
 import { getPriorityButtonBgColor } from "@/utils/get-priority-button-bg-color";
 import { formatDate } from "@/utils/format-date";
 import { useWindowSize } from "@vueuse/core";

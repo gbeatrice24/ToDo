@@ -22,14 +22,17 @@
 import SearchTodo from "@/components/SearchTodo.vue";
 import TodoHeader from "./TodoHeader.vue";
 import TaskCard from "@/components/TaskCard.vue";
-import { Task } from "@/types/Task";
+import { Task } from "@/types/task";
+import { SortingOptionLabel } from "@/types/sorting-option"
+
 import { ref, computed } from "vue";
 import FilterTodos from "@/components/FilterTodos.vue";
 
 const tasks = ref<Task[]>([]);
 const querySearch = ref("")
-const sortBy = ref("Title")
-const ascending = ref(true)
+const localSortingOption = ref<SortingOptionLabel>("Title");
+
+const localIsAscending = ref(true)
 
 const nextId = computed(() => tasks.value.length)
 const isEmpty = computed(() => tasks.value.length == 0)
@@ -49,7 +52,7 @@ const filteredTasks = computed(() => {
 })
 
 function sortArray(array: Task[]) {
-    switch (sortBy.value) {
+    switch (localSortingOption.value) {
         case "Title":
             array.sort((task1, task2) => task1.name.localeCompare(task2.name))
             break;
@@ -79,13 +82,9 @@ function sortArray(array: Task[]) {
             break;
     }
 
-
-
-    if (!ascending.value) {
+    if (!localIsAscending.value) {
         array.reverse()
     }
-
-
 }
 
 function handleAddTask() {
@@ -173,13 +172,17 @@ function handleSearch(search: string) {
     querySearch.value = search
 }
 
-function handleSort(by: string) {
-    sortBy.value = by
+function handleSort(sortingOption: SortingOptionLabel) {
+    localSortingOption.value = sortingOption;
 }
 
-function handleOrder(order: boolean) {
-    ascending.value = order
+function handleOrder(isAscending: boolean) {
+    localIsAscending.value = isAscending
 }
+
+
+
+
 
 //////// TEST /////////
 const task3 = {
