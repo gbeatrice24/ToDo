@@ -4,6 +4,6 @@ export interface Task {
   desc: string
   priority: string
   done: boolean
-  date: string
+  date: Date
   editing: boolean
 }

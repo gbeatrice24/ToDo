@@ -1,5 +1,5 @@
 <template>
-    <div class="p-4 rounded-2xl border-2 max-w-xs md:max-w-xl md:relative bg-white" @click="$emit('onEdit', task.id)">
+    <div class="p-4 rounded-2xl border-2 w-xs md:w-lg md:relative bg-white" @click="$emit('onEdit', task.id)">
         <!-- dim bg for priority dropdown -->
         <div v-if="!isMobile" class="absolute inset-0 bg-white rounded-2xl"
             :class="isPriorityDropdownVisible ? 'opacity-50' : 'invisible'"></div>
@@ -18,10 +18,11 @@
             </button>
 
             <!-- task info -->
-            <div class="order-2 pl-2 w-7/8 md:'order-1 md:w-1/1">
-                <div class="flex flex-row space-x-10 static">
+            <div class="order-2 pl-2 w-7/8 md:'order-1 md:w-full">
+                <div class="flex flex-row space-x-10 static justify-between">
                     <!-- task name -->
-                    <input v-model="newName" class="font-semibold text-black text-2xl outline-0 w-45 md:w-2/3" />
+                    <input v-model="newName" placeholder="Title"
+                        class="font-semibold text-black text-2xl outline-0 w-45 md:w-2/3" />
 
                     <!-- task priority on desktop -->
                     <div v-if="!isMobile" class="relative">
@@ -56,7 +57,7 @@
                         <div v-if="isMobile" class="flex flex-row space-x-2 content-center">
                             <font-awesome-icon v-if="task.editing" :icon="['fas', 'calendar-days']" />
                             <p class="w-xs" :class="task.editing ? '' : 'text-gray-500'">
-                                {{ task.date }}
+                                {{ formatDate(task.date) }}
                             </p>
                         </div>
 
@@ -109,12 +110,13 @@
 </template>
 
 <script setup lang="ts">
-import { Task } from "@/types/Task";
+import { Task } from "@/types/task";
 import { getPriorityButtonBgColor } from "@/utils/get-priority-button-bg-color";
+import { formatDate } from "@/utils/format-date";
 import { useWindowSize } from "@vueuse/core";
 import { ref, computed, watch } from "vue";
 
-import { faCalendarDays, faL } from "@fortawesome/free-solid-svg-icons";
+import { faCalendarDays } from "@fortawesome/free-solid-svg-icons";
 import { library } from "@fortawesome/fontawesome-svg-core";
 import Popup from "./Popup.vue";
 import Dropdown from "./Dropdown.vue";
