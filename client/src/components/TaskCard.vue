@@ -126,21 +126,21 @@ library.add(faCalendarDays);
 const props = defineProps<{ task: Task }>();
 
 const emit = defineEmits<{
-    (e: "onComplete", id: number): void;
-    (e: "onEdit", id: number): void;
+    (e: "onComplete", id: string): void;
+    (e: "onEdit", id: string): void;
 
     (
         e: "onSave",
         payload: {
-            id: number;
+            id: string;
             newName: string;
             newDesc: string;
             newPriority: string;
         }
     ): void;
-    (e: "onDelete", id: number): void;
+    (e: "onDelete", id: string): void;
 
-    (e: "onPriorityModified", payload: { id: number; priority: string }): void;
+    (e: "onPriorityModified", payload: { id: string; priority: string }): void;
 }>();
 
 const newName = ref(props.task.name);

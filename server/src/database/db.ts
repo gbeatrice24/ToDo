@@ -45,7 +45,7 @@ export async function createTestModels() {
   const testUser = new User({
     name: "testuser1",
     email: "test1@test.com",
-    password: "p",
+    password: "testuser1",
   });
 
   testUser.save();
