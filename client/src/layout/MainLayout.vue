@@ -27,7 +27,7 @@ import TaskCard from "@/components/TaskCard.vue";
 import { Task } from "@/types/task";
 import { SortingOptionLabel } from "@/types/sorting-option"
 
-import { ref, computed } from "vue";
+import { ref, computed, onMounted } from "vue";
 import FilterTodos from "@/components/FilterTodos.vue";
 
 const tasks = ref<Task[]>([]);
@@ -52,6 +52,20 @@ const filteredTasks = computed(() => {
 
     return [...editing, ...others];
 })
+
+onMounted(async () => {
+    try {
+        const response = await fetch("http://localhost:8080/api/todos");
+        const data = await response.json();
+        tasks.value = data.map((task: Task) => ({
+            ...task,
+            date: new Date(task.date) // convert it, because server sends it as a string
+        }));
+        console.log("loaded todos:", data);
+    } catch (error) {
+        console.error("Error loading todos:", error);
+    }
+});
 
 function sortArray(array: Task[]) {
     switch (localSortingOption.value) {
