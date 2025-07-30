@@ -107,7 +107,7 @@ function handleAddTask() {
     tasks.value.map((task) => (task.editing = false));
 
     const task = {
-        id: nextId.value,
+        id: "",
         name: "",
         desc: "",
         priority: "Priority",
@@ -116,11 +116,12 @@ function handleAddTask() {
         editing: true,
     };
 
+
     tasks.value.unshift(task);
     console.log("new task added:", task);
 }
 
-function handleDoneClicked(id: number) {
+function handleDoneClicked(id: string) {
     const index = tasks.value.findIndex(task => task.id === id);
     if (index !== -1) {
         const task = tasks.value[index]
@@ -134,36 +135,74 @@ function handleDoneClicked(id: number) {
     }
 }
 
-function handleEditRequested(id: number) {
+function handleEditRequested(id: string) {
     tasks.value.map((task) => {
         task.editing = task.id === id;
     });
 }
 
-function handleSaveClicked(payload: {
-    id: number;
+async function handleSaveClicked(payload: {
+    id: string;
     newName: string;
     newDesc: string;
     newPriority: string;
 }) {
     const { id, newName, newDesc, newPriority } = payload;
     const index = tasks.value.findIndex(task => task.id === id);
+    const isNewTask = id === "";
 
-    if (index !== -1) {
+    if (!isNewTask) {
         const task = tasks.value[index]
+
+        const response = await fetch("http://localhost:8080/api/todos", {
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                id: task.id,
+                name: newName,
+                desc: newDesc,
+                priority: newPriority,
+            }),
+        });
+
+        const updatedTask = await response.json();
+        console.log("task updated")
+
         tasks.value.splice(index, 1, {
-            ...task,
-            name: newName,
-            desc: newDesc,
-            priority: newPriority,
+            ...updatedTask,
             editing: false,
         });
 
         console.log("Task", id, "changed", newName, newDesc, newPriority);
     }
+    else {
+        const response = await fetch("http://localhost:8080/api/todos", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                name: newName,
+                desc: newDesc,
+                priority: newPriority,
+                date: new Date().toISOString(),
+                userId: "688a0de176a2656ea3527afb", // here will come the user id, for now i hardcode the test users
+            }),
+        });
+
+        const savedTask = await response.json();
+        console.log("new task saved")
+
+        tasks.value.splice(index, 1, {
+            ...savedTask,
+            editing: false,
+        });
+    }
 }
 
-function handleDeleteClicked(id: number) {
+function handleDeleteClicked(id: string) {
     const index = tasks.value.findIndex(task => task.id === id);
 
     if (index !== -1) {
@@ -173,7 +212,7 @@ function handleDeleteClicked(id: number) {
     }
 }
 
-function handlePriorityChoosen(payload: { id: number; priority: string }) {
+function handlePriorityChoosen(payload: { id: string; priority: string }) {
     const { id, priority } = payload;
     const index = tasks.value.findIndex(task => task.id === id);
 
@@ -196,43 +235,6 @@ function handleOrder(isAscending: boolean) {
     localIsAscending.value = isAscending
 }
 
-
-
-
-
-/* //////// TEST /////////
-const task3 = {
-    id: nextId.value,
-    name: "a This is the first title",
-    desc: "b This is the second description, lastest date",
-    priority: "Low",
-    done: false,
-    date: new Date("2023-01-01"),
-    editing: false,
-};
-tasks.value.unshift(task3);
-
-const task2 = {
-    id: nextId.value,
-    name: "c This is the third title",
-    desc: "a This is the first description second date",
-    priority: "Medium",
-    done: false,
-    date: new Date("2024-01-01"),
-    editing: false,
-};
-tasks.value.unshift(task2);
-
-const task1 = {
-    id: nextId.value,
-    name: "b This is the second title",
-    desc: "c This is the last description, the newest date",
-    priority: "High",
-    done: false,
-    date: new Date("2025-01-01"),
-    editing: false,
-};
-tasks.value.unshift(task1); */
 </script>
 
 <style scoped>

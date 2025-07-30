@@ -8,6 +8,7 @@ import {
   getAllTodos,
 } from "@/database/db";
 import todoRoutes from "./todo/todo.routes";
+import userRoutes from "./user/user.routes";
 
 const PORT = process.env.PORT || 8080;
 
@@ -29,6 +30,7 @@ app.get("/", async (_req, res) => {
 });
 
 app.use("/api", todoRoutes);
+app.use("/api", userRoutes);
 
 connectDB().then(() => {
   app.listen(PORT, () => {
