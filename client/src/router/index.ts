@@ -1,7 +1,7 @@
 import { createRouter, createWebHistory } from "vue-router";
-import LoginView from "@/views/LoginView.vue";
 import MainLayout from "@/layout/MainLayout.vue";
 import LoginLayout from "@/layout/LoginLayout.vue";
+import SignupLayout from "@/layout/SignupLayout.vue";
 
 const routes = [
   {
@@ -10,14 +10,11 @@ const routes = [
   },
   {
     path: "/login",
-    component: LoginLayout, // layout for login page
-    children: [
-      {
-        path: "",
-        name: "Login",
-        component: LoginView,
-      },
-    ],
+    component: LoginLayout,
+  },
+  {
+    path: "/signup",
+    component: SignupLayout,
   },
 ];
 
