@@ -13,6 +13,7 @@
                         class="outline-0 w-full border-b-2 border-gray-300 "></input>
                     <p class="text-xs font-semibold" @click="handleLogin">Already have an account? Log in
                         here.</p>
+                    <p v-if="errorMessage" class="text-red-500"> {{ errorMessage }}</p>
                 </div>
                 <button class="bg-emerald-400 text-white rounded-lg w-15 md:rounded-xl md:p-3 md:w-20">
                     Sign up
@@ -32,6 +33,8 @@ const name = ref("")
 
 const router = useRouter()
 
+const errorMessage = ref("")
+
 function handleLogin() {
     router.push('/login')
 }
@@ -47,9 +50,16 @@ async function handleSignup() {
         });
 
 
+        const result = await response.json();
 
-        console.log("signup successful");
-        router.push('/login')
+        if (response.ok) {
+            console.log("signup successful");
+            router.push('/login')
+            errorMessage.value = ""
+        }
+        else {
+            errorMessage.value = response.status === 409 ? result : "Sign up failed"
+        }
     } catch (err) {
         console.error(err);
     }

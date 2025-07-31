@@ -12,7 +12,8 @@ export async function signupUser(req: Request, res: Response) {
   try {
     const existingUser = await User.findOne({ email });
     if (existingUser) {
-      return res.status(409).json({ error: "User already exists" });
+      console.log("megvan");
+      return res.status(409).json("User already exists");
     }
 
     const newUser = new User({
@@ -22,9 +23,9 @@ export async function signupUser(req: Request, res: Response) {
     });
 
     await newUser.save();
-    res.status(201).json("Signup successful");
+    res.status(200).json("Signup successful");
   } catch (err) {
-    res.status(500).json({ error: "Signup failed", details: err });
+    res.status(500).json(err);
   }
 }
 
