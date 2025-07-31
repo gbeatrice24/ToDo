@@ -193,6 +193,11 @@ async function handleEditRequested(id: string) {
             console.error("error:", err);
         }
     }
+
+    tasks.value.map((task) => {
+        task.editing = task.id === id;
+    });
+
 }
 
 async function handleSaveClicked(payload: {
