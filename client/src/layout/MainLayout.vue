@@ -170,7 +170,7 @@ async function handleEditRequested(id: string) {
         const currentEditState = task.editing
 
         try {
-            const response = await fetch("http://localhost:8080/api/todos/updateDone", {
+            const response = await fetch("http://localhost:8080/api/todos/updateEditing", {
                 method: "PUT",
                 headers: {
                     "Content-Type": "application/json",
@@ -197,7 +197,6 @@ async function handleEditRequested(id: string) {
     tasks.value.map((task) => {
         task.editing = task.id === id;
     });
-
 }
 
 async function handleSaveClicked(payload: {
