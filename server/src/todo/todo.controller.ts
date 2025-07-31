@@ -1,22 +1,15 @@
 import { Request, Response } from "express";
 import Todo from "./todo.model";
+import { getTodoService } from "./todo.service/getTodo.service";
+import { insertTodoService } from "./todo.service/insertTodo.service";
+import { updateTodoService } from "./todo.service/updateTodo.service";
+import { updateTodoDoneService } from "./todo.service/updateTodoDone.service";
+import { updateTodoEditingService } from "./todo.service/updateTodoEditing.service";
 
-// get todos
 export async function getTodos(req: Request, res: Response) {
   try {
-    const todos = await Todo.find();
-
-    const mappedTodos = todos.map((todo) => ({
-      id: todo._id.toString(),
-      name: todo.name,
-      desc: todo.desc,
-      date: todo.date,
-      priority: todo.priority,
-      done: todo.done,
-      editing: false,
-    }));
-
-    res.status(200).json(mappedTodos);
+    const todos = await getTodoService();
+    res.status(200).json(todos);
   } catch (error) {
     res.status(500).json({ error: "Failed to fetch todos" });
   }
@@ -26,17 +19,8 @@ export async function getTodos(req: Request, res: Response) {
 export async function insertTodo(req: Request, res: Response) {
   const { name, desc, priority, userId } = req.body;
   try {
-    const newTodo = new Todo({
-      name: name,
-      desc: desc,
-      priority: priority,
-      date: new Date(),
-      done: false,
+    const savedTodo = await insertTodoService(name, desc, priority, userId);
 
-      user: userId,
-    });
-
-    const savedTodo = await newTodo.save();
     res.status(200).json({
       id: savedTodo._id.toString(),
       name: savedTodo.name,
@@ -55,11 +39,7 @@ export async function updateTodo(req: Request, res: Response) {
   const { id } = req.params;
   const { name, desc, priority } = req.body;
   try {
-    const updatedTodo = await Todo.findByIdAndUpdate(
-      id,
-      { name, desc, priority },
-      { new: true }
-    );
+    const updatedTodo = await updateTodoService(id, name, desc, priority);
 
     if (!updatedTodo) {
       return res.status(404).json({ error: "Todo not found" });
@@ -83,11 +63,7 @@ export async function updateTodoDone(req: Request, res: Response) {
   const { id } = req.params;
   const { doneState } = req.body;
   try {
-    const updatedTodo = await Todo.findByIdAndUpdate(
-      id,
-      { done: doneState },
-      { new: true }
-    );
+    const updatedTodo = await updateTodoDoneService(id, doneState);
 
     if (!updatedTodo) {
       return res.status(404).json({ error: "Todo not found" });
@@ -114,11 +90,7 @@ export async function updateTodoEditing(req: Request, res: Response) {
   try {
     await Todo.updateMany({}, { $set: { editing: false } });
 
-    const updatedTodo = await Todo.findByIdAndUpdate(
-      id,
-      { editing: editState },
-      { new: true }
-    );
+    const updatedTodo = await updateTodoEditingService(id, editState);
 
     if (!updatedTodo) {
       return res.status(404).json({ error: "Todo not found" });

@@ -163,7 +163,7 @@ async function handleDoneClicked(id: string) {
 
 async function handleEditRequested(id: string) {
     const index = tasks.value.findIndex(task => task.id === id);
-    if (index !== -1) {
+    if (index !== -1 && id !== "") {
         const task = tasks.value[index]
         const newEditState = !task.editing;
 
@@ -204,8 +204,6 @@ async function handleSaveClicked(payload: {
     const isNewTask = id === "";
 
     if (!isNewTask) {
-        const task = tasks.value[index]
-
         const response = await fetch(`http://localhost:8080/api/todos/${id}/update`, {
             method: "PUT",
             headers: {
