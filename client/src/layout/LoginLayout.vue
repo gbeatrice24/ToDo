@@ -32,7 +32,7 @@ async function handleLogin() {
     console.log("user login infos:", email.value, password.value)
 
     try {
-        const response = await fetch("http://localhost:8080/api/login", {
+        const response = await fetch("http://localhost:8080/api/user/login", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
@@ -41,9 +41,10 @@ async function handleLogin() {
         });
 
         const result = await response.json();
-
-        console.log("login successful:", result);
-        router.push('/')
+        if (result) {
+            console.log("login successful:", result);
+            router.push('/')
+        }
     } catch (err) {
         console.error(err);
     }
