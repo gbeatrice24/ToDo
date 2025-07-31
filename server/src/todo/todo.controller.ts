@@ -105,3 +105,32 @@ export async function updateTodoDone(req: Request, res: Response) {
     res.status(500).json({ error: "Failed to update todo" });
   }
 }
+
+export async function updateTodoEdit(req: Request, res: Response) {
+  const { id, editState } = req.body;
+  try {
+    const updatedTodo = await Todo.findByIdAndUpdate(
+      id,
+      { editing: editState },
+      { new: true }
+    );
+
+    if (!updatedTodo) {
+      return res.status(404).json({ error: "Todo not found" });
+    }
+
+    res.status(200).json({
+      id: updatedTodo._id.toString(),
+      name: updatedTodo.name,
+      desc: updatedTodo.desc,
+      date: updatedTodo.date,
+      priority: updatedTodo.priority,
+      done: updatedTodo.done,
+      editing: editState,
+    });
+
+    res.status(200).json(updatedTodo);
+  } catch (err) {
+    res.status(500).json({ error: "Failed to update todo" });
+  }
+}
