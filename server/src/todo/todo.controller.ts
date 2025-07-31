@@ -106,7 +106,7 @@ export async function updateTodoDone(req: Request, res: Response) {
   }
 }
 
-export async function updateTodoEdit(req: Request, res: Response) {
+export async function updateTodoEditing(req: Request, res: Response) {
   const { id, editState } = req.body;
   try {
     await Todo.updateMany({}, { $set: { editing: false } });
