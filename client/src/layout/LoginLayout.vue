@@ -5,10 +5,8 @@
 
             <form @submit="handleLogin" class="flex flex-col items-center space-y-10 w-90 pt-7">
                 <div class="flex flex-col w-80 items-center space-y-5">
-                    <input v-model="email" type="email" placeholder="Email" required
-                        class="outline-0 w-full border-b-2 border-gray-300 "></input>
-                    <input v-model="password" type="password" placeholder="Password" required
-                        class="outline-0 w-full border-b-2 border-gray-300 "></input>
+                    <BaseInput v-model="email" type="email" placeholder="Email" required />
+                    <BaseInput v-model="password" type="password" placeholder="Password" required />
                     <button class="text-xs font-semibold" @click="handleSignup">No account? Sign up here.</button>
                 </div>
 
@@ -23,6 +21,7 @@
 <script setup lang="ts">
 import { ref } from "vue"
 import { useRouter } from "vue-router"
+import BaseInput from "@/components/BaseInput.vue"
 
 const email = ref("")
 const password = ref("")
