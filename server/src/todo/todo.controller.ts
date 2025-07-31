@@ -135,3 +135,20 @@ export async function updateTodoEditing(req: Request, res: Response) {
     res.status(500).json({ error: "Failed to update todo" });
   }
 }
+
+export async function deleteTodo(req: Request, res: Response) {
+  const { id } = req.params;
+
+  try {
+    const deletedTodo = await Todo.findByIdAndDelete(id);
+
+    if (!deletedTodo) {
+      return res.status(404).json({ error: "Todo not found" });
+    }
+
+    res.status(200).json({ message: "Todo deleted successfully" });
+  } catch (err) {
+    res.status(500).json({ error: "Failed to delete todo" });
+    console.log("error", err);
+  }
+}

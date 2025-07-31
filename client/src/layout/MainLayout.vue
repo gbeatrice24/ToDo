@@ -251,7 +251,6 @@ async function handleSaveClicked(payload: {
         });
 
         const savedTask = await response.json();
-        console.log("new task saved")
 
         tasks.value.splice(index, 1, {
             ...savedTask,
@@ -262,13 +261,19 @@ async function handleSaveClicked(payload: {
     console.log(id)
 }
 
-function handleDeleteClicked(id: string) {
+async function handleDeleteClicked(id: string) {
     const index = tasks.value.findIndex(task => task.id === id);
 
     if (index !== -1) {
-        console.log("Before delete", [...tasks.value]);
         tasks.value.splice(index, 1);
-        console.log("After delete", [...tasks.value]);
+    }
+
+    try {
+        await fetch(`http://localhost:8080/api/todos/${id}`, {
+            method: "DELETE",
+        });
+    } catch (err) {
+        console.error("error:", err);
     }
 }
 
