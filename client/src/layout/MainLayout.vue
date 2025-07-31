@@ -163,10 +163,36 @@ async function handleDoneClicked(id: string) {
     }
 }
 
-function handleEditRequested(id: string) {
-    tasks.value.map((task) => {
-        task.editing = task.id === id;
-    });
+async function handleEditRequested(id: string) {
+    const index = tasks.value.findIndex(task => task.id === id);
+    if (index !== -1) {
+        const task = tasks.value[index]
+        const currentEditState = task.editing
+
+        try {
+            const response = await fetch("http://localhost:8080/api/todos/updateDone", {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    id: task.id,
+                    editState: !currentEditState
+                }),
+            });
+
+            const updatedTask = await response.json();
+
+            tasks.value.splice(index, 1, {
+                ...updatedTask,
+                editing: !currentEditState
+            });
+
+            console.log("Task", id, "done modified");
+        } catch (err) {
+            console.error("error:", err);
+        }
+    }
 }
 
 async function handleSaveClicked(payload: {
