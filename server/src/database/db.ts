@@ -48,7 +48,7 @@ export async function createTestModels() {
     password: "testuser1",
   });
 
-  testUser.save();
+  await testUser.save();
 
   const testTodo = new Todo({
     name: "task1",
@@ -56,6 +56,7 @@ export async function createTestModels() {
     priority: "Medium",
     date: new Date(),
     done: false,
+    editing: false,
     user: testUser._id,
   });
 
@@ -65,9 +66,10 @@ export async function createTestModels() {
     priority: "High",
     date: new Date(),
     done: false,
+    editing: false,
     user: testUser._id,
   });
 
-  testTodo.save();
-  testTodo2.save();
+  await testTodo.save();
+  await testTodo2.save();
 }

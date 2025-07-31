@@ -36,19 +36,29 @@ const localSortingOption = ref<SortingOptionLabel>("Title");
 
 const localIsAscending = ref(true)
 
-const nextId = computed(() => tasks.value.length)
 const isEmpty = computed(() => tasks.value.length == 0)
 
 
 const filteredTasks = computed(() => {
-    let result = tasks.value.filter((task) =>
-        task.name.toLowerCase().includes(querySearch.value.toLowerCase()) ||
-        task.desc.toLowerCase().includes(querySearch.value.toLowerCase()))
+    const result = tasks.value.filter((task) => {
+        if (!task || typeof task.name !== "string" || typeof task.desc !== "string") {
+            console.warn("Invalid task:", task);
+            return false;
+        }
+
+        return (
+            task.name.toLowerCase().includes(querySearch.value.toLowerCase()) ||
+            task.desc.toLowerCase().includes(querySearch.value.toLowerCase())
+        );
+    })
+
 
     sortArray(result);
 
     const editing = result.filter(task => task.editing);
     const others = result.filter(task => !task.editing);
+
+    console.log(filteredTasks)
 
     return [...editing, ...others];
 })
@@ -61,7 +71,7 @@ onMounted(async () => {
             ...task,
             date: new Date(task.date) // convert it, because server sends it as a string
         }));
-        console.log("loaded todos:", data);
+        console.log("loaded todos:", tasks.value);
     } catch (error) {
         console.error("Error loading todos:", error);
     }
@@ -121,17 +131,35 @@ function handleAddTask() {
     console.log("new task added:", task);
 }
 
-function handleDoneClicked(id: string) {
+async function handleDoneClicked(id: string) {
     const index = tasks.value.findIndex(task => task.id === id);
     if (index !== -1) {
         const task = tasks.value[index]
+        const currentDoneState = task.done
 
-        tasks.value.splice(index, 1, {
-            ...task,
-            done: !task.done,
-        });
+        try {
+            const response = await fetch("http://localhost:8080/api/todos/updateDone", {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    id: task.id,
+                    doneState: !currentDoneState
+                }),
+            });
 
-        console.log("Task", id, "done modified");
+            const updatedTask = await response.json();
+
+            tasks.value.splice(index, 1, {
+                ...updatedTask,
+                done: !currentDoneState
+            });
+
+            console.log("Task", id, "done modified");
+        } catch (err) {
+            console.error("error:", err);
+        }
     }
 }
 
@@ -168,10 +196,10 @@ async function handleSaveClicked(payload: {
         });
 
         const updatedTask = await response.json();
-        console.log("task updated")
 
         tasks.value.splice(index, 1, {
             ...updatedTask,
+            date: new Date(updatedTask.date),
             editing: false,
         });
 
@@ -200,6 +228,8 @@ async function handleSaveClicked(payload: {
             editing: false,
         });
     }
+
+    console.log(id)
 }
 
 function handleDeleteClicked(id: string) {
