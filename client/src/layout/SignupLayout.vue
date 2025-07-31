@@ -11,8 +11,8 @@
                         class="outline-0 w-full border-b-2 border-gray-300 "></input>
                     <input v-model="password" type="password" placeholder="Password" required
                         class="outline-0 w-full border-b-2 border-gray-300 "></input>
-                    <button class="text-xs font-semibold" @click="handleLogin">Already have an account? Log in
-                        here.</button>
+                    <p class="text-xs font-semibold" @click="handleLogin">Already have an account? Log in
+                        here.</p>
                 </div>
                 <button class="bg-emerald-400 text-white rounded-lg w-15 md:rounded-xl md:p-3 md:w-20">
                     Sign up
@@ -37,8 +37,6 @@ function handleLogin() {
 }
 
 async function handleSignup() {
-    console.log("user login infos:", email.value, password.value)
-
     try {
         const response = await fetch("http://localhost:8080/api/user/signup", {
             method: "POST",
@@ -48,14 +46,12 @@ async function handleSignup() {
             body: JSON.stringify({ name: name.value, email: email.value, password: password.value })
         });
 
-        const result = await response.json();
 
-        console.log("signup successful:", result);
-        router.push('/')
+
+        console.log("signup successful");
+        router.push('/login')
     } catch (err) {
         console.error(err);
     }
-
-    router.push('/login')
 }
 </script>

@@ -10,15 +10,19 @@ export async function signupUser(req: Request, res: Response) {
   const hashedPassword = await bcrypt.hash(password, salt);
 
   try {
-    const newUser = await User.insertOne({
-      name: name,
-      email: email,
+    const existingUser = await User.findOne({ email });
+    if (existingUser) {
+      return res.status(409).json({ error: "User already exists" });
+    }
+
+    const newUser = new User({
+      name,
+      email,
       password: hashedPassword,
     });
 
-    if (!newUser) {
-      res.status(400).json({ error: "Signup failed" });
-    }
+    await newUser.save();
+    res.status(201).json("Signup successful");
   } catch (err) {
     res.status(500).json({ error: "Signup failed", details: err });
   }
