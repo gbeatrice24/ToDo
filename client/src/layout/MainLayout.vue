@@ -135,26 +135,24 @@ async function handleDoneClicked(id: string) {
     const index = tasks.value.findIndex(task => task.id === id);
     if (index !== -1) {
         const task = tasks.value[index]
-        const currentDoneState = task.done
+        const newDoneState = !task.done
 
         try {
-            const response = await fetch("http://localhost:8080/api/todos/updateDone", {
+            const response = await fetch(`http://localhost:8080/api/todos/${id}/done`, {
                 method: "PUT",
                 headers: {
                     "Content-Type": "application/json",
                 },
                 body: JSON.stringify({
-                    id: task.id,
-                    doneState: !currentDoneState
+                    doneState: newDoneState
                 }),
             });
 
             const updatedTask = await response.json();
 
-            tasks.value.splice(index, 1, {
-                ...updatedTask,
-                done: !currentDoneState
-            });
+            tasks.value.splice(index, 1,
+                updatedTask
+            );
 
             console.log("Task", id, "done modified");
         } catch (err) {
@@ -167,36 +165,32 @@ async function handleEditRequested(id: string) {
     const index = tasks.value.findIndex(task => task.id === id);
     if (index !== -1) {
         const task = tasks.value[index]
-        const currentEditState = task.editing
+        const newEditState = !task.editing;
 
         try {
-            const response = await fetch("http://localhost:8080/api/todos/updateEditing", {
+            const response = await fetch(`http://localhost:8080/api/todos/${id}/editing`, {
                 method: "PUT",
                 headers: {
                     "Content-Type": "application/json",
                 },
                 body: JSON.stringify({
-                    id: task.id,
-                    editState: !currentEditState
+                    editing: newEditState
                 }),
             });
 
             const updatedTask = await response.json();
 
-            tasks.value.splice(index, 1, {
-                ...updatedTask,
-                editing: !currentEditState
-            });
+            tasks.value.splice(index, 1, updatedTask);
 
-            console.log("Task", id, "done modified");
+            console.log("Task", id, "editing state toggled");
         } catch (err) {
             console.error("error:", err);
         }
-    }
 
-    tasks.value.map((task) => {
-        task.editing = task.id === id;
-    });
+        tasks.value.map((task) => {
+            task.editing = task.id === id;
+        });
+    }
 }
 
 async function handleSaveClicked(payload: {
@@ -212,13 +206,12 @@ async function handleSaveClicked(payload: {
     if (!isNewTask) {
         const task = tasks.value[index]
 
-        const response = await fetch("http://localhost:8080/api/todos", {
+        const response = await fetch(`http://localhost:8080/api/todos/${id}/update`, {
             method: "PUT",
             headers: {
                 "Content-Type": "application/json",
             },
             body: JSON.stringify({
-                id: task.id,
                 name: newName,
                 desc: newDesc,
                 priority: newPriority,

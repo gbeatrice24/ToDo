@@ -52,7 +52,8 @@ export async function insertTodo(req: Request, res: Response) {
 }
 
 export async function updateTodo(req: Request, res: Response) {
-  const { id, name, desc, priority } = req.body;
+  const { id } = req.params;
+  const { name, desc, priority } = req.body;
   try {
     const updatedTodo = await Todo.findByIdAndUpdate(
       id,
@@ -79,7 +80,8 @@ export async function updateTodo(req: Request, res: Response) {
 }
 
 export async function updateTodoDone(req: Request, res: Response) {
-  const { id, doneState } = req.body;
+  const { id } = req.params;
+  const { doneState } = req.body;
   try {
     const updatedTodo = await Todo.findByIdAndUpdate(
       id,
@@ -100,16 +102,18 @@ export async function updateTodoDone(req: Request, res: Response) {
       done: doneState,
       editing: false,
     });
-    res.status(200).json(updatedTodo);
   } catch (err) {
     res.status(500).json({ error: "Failed to update todo" });
   }
 }
 
 export async function updateTodoEditing(req: Request, res: Response) {
-  const { id, editState } = req.body;
+  const { id } = req.params;
+  const { editState } = req.body;
+
   try {
     await Todo.updateMany({}, { $set: { editing: false } });
+
     const updatedTodo = await Todo.findByIdAndUpdate(
       id,
       { editing: editState },
@@ -129,8 +133,6 @@ export async function updateTodoEditing(req: Request, res: Response) {
       done: updatedTodo.done,
       editing: editState,
     });
-
-    res.status(200).json(updatedTodo);
   } catch (err) {
     res.status(500).json({ error: "Failed to update todo" });
   }
