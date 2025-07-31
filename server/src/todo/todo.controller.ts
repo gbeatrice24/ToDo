@@ -37,7 +37,15 @@ export async function insertTodo(req: Request, res: Response) {
     });
 
     const savedTodo = await newTodo.save();
-    res.status(201).json(savedTodo);
+    res.status(200).json({
+      id: savedTodo._id.toString(),
+      name: savedTodo.name,
+      desc: savedTodo.desc,
+      date: savedTodo.date,
+      priority: savedTodo.priority,
+      done: savedTodo.done,
+      editing: false,
+    });
   } catch (err) {
     res.status(500).json({ error: "Failed to insert todo" });
   }
@@ -56,6 +64,42 @@ export async function updateTodo(req: Request, res: Response) {
       return res.status(404).json({ error: "Todo not found" });
     }
 
+    res.status(200).json({
+      id: updatedTodo._id.toString(),
+      name: updatedTodo.name,
+      desc: updatedTodo.desc,
+      date: updatedTodo.date,
+      priority: updatedTodo.priority,
+      done: updatedTodo.done,
+      editing: false,
+    });
+  } catch (err) {
+    res.status(500).json({ error: "Failed to update todo" });
+  }
+}
+
+export async function updateTodoDone(req: Request, res: Response) {
+  const { id, doneState } = req.body;
+  try {
+    const updatedTodo = await Todo.findByIdAndUpdate(
+      id,
+      { done: doneState },
+      { new: true }
+    );
+
+    if (!updatedTodo) {
+      return res.status(404).json({ error: "Todo not found" });
+    }
+
+    res.status(200).json({
+      id: updatedTodo._id.toString(),
+      name: updatedTodo.name,
+      desc: updatedTodo.desc,
+      date: updatedTodo.date,
+      priority: updatedTodo.priority,
+      done: doneState,
+      editing: false,
+    });
     res.status(200).json(updatedTodo);
   } catch (err) {
     res.status(500).json({ error: "Failed to update todo" });
