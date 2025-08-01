@@ -23,14 +23,11 @@ export async function insertTodo(req: Request, res: Response) {
   try {
     const savedTodo = await insertTodoService(name, desc, priority, userId);
 
+    const todoObj = savedTodo.toObject();
+
     res.status(200).json({
-      id: savedTodo._id.toString(),
-      name: savedTodo.name,
-      desc: savedTodo.desc,
-      date: savedTodo.date,
-      priority: savedTodo.priority,
-      done: savedTodo.done,
-      editing: false,
+      ...todoObj,
+      id: todoObj._id.toString(),
     });
   } catch (err) {
     res.status(500).json({ error: "Failed to insert todo" });
@@ -47,14 +44,13 @@ export async function updateTodo(req: Request, res: Response) {
       return res.status(404).json({ error: "Todo not found" });
     }
 
+    console.log("the updated tasks date", updatedTodo.date);
+
+    const todoObj = updatedTodo.toObject();
+
     res.status(200).json({
-      id: updatedTodo._id.toString(),
-      name: updatedTodo.name,
-      desc: updatedTodo.desc,
-      date: updatedTodo.date,
-      priority: updatedTodo.priority,
-      done: updatedTodo.done,
-      editing: false,
+      ...todoObj,
+      id: todoObj._id.toString(),
     });
   } catch (err) {
     res.status(500).json({ error: "Failed to update todo" });
@@ -71,14 +67,11 @@ export async function updateTodoDone(req: Request, res: Response) {
       return res.status(404).json({ error: "Todo not found" });
     }
 
+    const todoObj = updatedTodo.toObject();
+
     res.status(200).json({
-      id: updatedTodo._id.toString(),
-      name: updatedTodo.name,
-      desc: updatedTodo.desc,
-      date: updatedTodo.date,
-      priority: updatedTodo.priority,
-      done: doneState,
-      editing: false,
+      ...todoObj,
+      id: todoObj._id.toString(),
     });
   } catch (err) {
     res.status(500).json({ error: "Failed to update todo" });
@@ -98,14 +91,11 @@ export async function updateTodoEditing(req: Request, res: Response) {
       return res.status(404).json({ error: "Todo not found" });
     }
 
+    const todoObj = updatedTodo.toObject();
+
     res.status(200).json({
-      id: updatedTodo._id.toString(),
-      name: updatedTodo.name,
-      desc: updatedTodo.desc,
-      date: updatedTodo.date,
-      priority: updatedTodo.priority,
-      done: updatedTodo.done,
-      editing: editState,
+      ...todoObj,
+      id: todoObj._id.toString(),
     });
   } catch (err) {
     res.status(500).json({ error: "Failed to update todo" });

@@ -65,6 +65,7 @@ const filteredTasks = computed(() => {
 
 onMounted(async () => {
     const data = await client.get('/todos');
+    console.log("Raw todos from server:", data);
     if (data) {
         tasks.value = data.map((task: Task) => ({
             ...task,
@@ -136,9 +137,7 @@ async function handleDoneClicked(id: string) {
         const updatedTask = await client.put(`/todos/${id}/done`, { doneState: newDoneState });
 
         if (updatedTask) {
-            tasks.value.splice(index, 1,
-                updatedTask
-            );
+            tasks.value.splice(index, 1, { ...updatedTask, done: newDoneState });
 
             console.log("Task", id, "done modified");
         }
@@ -180,6 +179,8 @@ async function handleSaveClicked(payload: {
             priority: newPriority,
         });
 
+        console.log("ipdated name: ", updatedTask.name)
+
         if (updatedTask) {
             tasks.value.splice(index, 1, {
                 ...updatedTask,
@@ -195,7 +196,6 @@ async function handleSaveClicked(payload: {
             name: newName,
             desc: newDesc,
             priority: newPriority,
-            date: new Date().toISOString(),
             userId: "688a0de176a2656ea3527afb",
         });
 

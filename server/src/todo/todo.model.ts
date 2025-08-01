@@ -1,6 +1,7 @@
 import mongoose from "mongoose";
 
 const todoSchema = new mongoose.Schema({
+  _id: { type: mongoose.Schema.Types.ObjectId, required: true, auto: true },
   name: { type: String, required: true },
   desc: { type: String, required: true },
   priority: { type: String, required: true },

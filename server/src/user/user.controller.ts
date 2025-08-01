@@ -8,8 +8,9 @@ export async function loginUser(req: Request, res: Response) {
 
   try {
     const user = await User.findOne({ email });
-    if (!user)
+    if (!user) {
       return res.status(400).json({ error: "Invalid email or password" });
+    }
 
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
