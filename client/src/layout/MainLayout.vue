@@ -26,7 +26,7 @@ import TodoHeader from "./TodoHeader.vue";
 import TaskCard from "@/components/TaskCard.vue";
 import { Task } from "@/types/task";
 import { SortingOptionLabel } from "@/types/sorting-option"
-import { httpGet, httpPost, httpPut, httpDelete } from "@/http.service"
+import { client } from "@/http.service"
 
 import { ref, computed, onMounted } from "vue";
 import FilterTodos from "@/components/FilterTodos.vue";
@@ -64,15 +64,13 @@ const filteredTasks = computed(() => {
 })
 
 onMounted(async () => {
-    try {
-        const data = await httpGet('/todos');
+    const data = await client.get('/todos');
+    if (data) {
         tasks.value = data.map((task: Task) => ({
             ...task,
             date: new Date(task.date) // convert it, because server sends it as a string
         }));
-        console.log("loaded todos:", tasks.value);
-    } catch (error) {
-        console.error("Error loading todos:", error);
+        console.log("Loaded todos:", tasks.value);
     }
 });
 
@@ -135,17 +133,14 @@ async function handleDoneClicked(id: string) {
     if (index !== -1) {
         const task = tasks.value[index]
         const newDoneState = !task.done
+        const updatedTask = await client.put(`/todos/${id}/done`, { doneState: newDoneState });
 
-        try {
-            const updatedTask = await httpPut(`/todos/${id}/done`, { doneState: newDoneState });
-
+        if (updatedTask) {
             tasks.value.splice(index, 1,
                 updatedTask
             );
 
             console.log("Task", id, "done modified");
-        } catch (err) {
-            console.error("error:", err);
         }
     }
 }
@@ -156,19 +151,15 @@ async function handleEditRequested(id: string) {
         const task = tasks.value[index]
         const newEditState = !task.editing;
 
-        try {
-            const updatedTask = await httpPut(`/todos/${id}/done`, { editing: newEditState });
 
-            tasks.value.splice(index, 1, updatedTask);
-
+        const updatedTask = await client.put(`/todos/${id}/done`, { editing: newEditState });
+        if (updatedTask) {
             console.log("Task", id, "editing state toggled");
-        } catch (err) {
-            console.error("error:", err);
-        }
 
-        tasks.value.map((task) => {
-            task.editing = task.id === id;
-        });
+            tasks.value.map((task) => {
+                task.editing = task.id === id;
+            });
+        }
     }
 }
 
@@ -183,22 +174,24 @@ async function handleSaveClicked(payload: {
     const isNewTask = id === "";
 
     if (!isNewTask) {
-        const updatedTask = await httpPut(`/todos/${id}/update`, {
+        const updatedTask = await client.put(`/todos/${id}/update`, {
             name: newName,
             desc: newDesc,
             priority: newPriority,
         });
 
-        tasks.value.splice(index, 1, {
-            ...updatedTask,
-            date: new Date(updatedTask.date),
-            editing: false,
-        });
+        if (updatedTask) {
+            tasks.value.splice(index, 1, {
+                ...updatedTask,
+                date: new Date(updatedTask.date),
+                editing: false,
+            });
 
-        console.log("Task", id, "changed", newName, newDesc, newPriority);
+            console.log("Task", id, "changed", newName, newDesc, newPriority);
+        }
     }
     else {
-        const savedTask = await httpPost(`/todos/`, {
+        const savedTask = await client.post(`/todos/`, {
             name: newName,
             desc: newDesc,
             priority: newPriority,
@@ -206,26 +199,25 @@ async function handleSaveClicked(payload: {
             userId: "688a0de176a2656ea3527afb",
         });
 
-        tasks.value.splice(index, 1, {
-            ...savedTask,
-            editing: false,
-        });
+        if (savedTask) {
+            tasks.value.splice(index, 1, {
+                ...savedTask,
+                editing: false,
+            });
+        }
     }
-
-    console.log(id)
 }
 
 async function handleDeleteClicked(id: string) {
     const index = tasks.value.findIndex(task => task.id === id);
 
-    if (index !== -1) {
-        tasks.value.splice(index, 1);
-    }
+    const resp = await client.delete(`/todos/${id}`);
 
-    try {
-        await httpDelete(`/todos/${id}`);
-    } catch (err) {
-        console.error("error:", err);
+    if (resp) {
+
+        if (index !== -1) {
+            tasks.value.splice(index, 1);
+        }
     }
 }
 
