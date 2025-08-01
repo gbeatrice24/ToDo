@@ -1,10 +1,12 @@
 <template>
     <div class="min-h-screen space-y-5">
         <TodoHeader @onAddTask="handleAddTask" />
+        <router-view />
 
-        <SearchTodo v-if="!isEmpty" @onSearch="handleSearch" />
-
-        <FilterTodos @onSort="handleSort" @onOrder="handleOrder" />
+        <div v-if="!isEmpty">
+            <SearchTodo @onSearch="handleSearch" />
+            <FilterTodos class="pt-5 " @onSort="handleSort" @onOrder="handleOrder" />
+        </div>
 
         <div class="flex justify-center  items-center ">
             <img v-if="isEmpty" class="" src="../assets/NoTodos.svg" alt="NoTodos" />
@@ -184,7 +186,7 @@ function handleOrder(isAscending: boolean) {
 
 
 
-//////// TEST /////////
+/* //////// TEST /////////
 const task3 = {
     id: nextId.value,
     name: "a This is the first title",
@@ -216,7 +218,7 @@ const task1 = {
     date: new Date("2025-01-01"),
     editing: false,
 };
-tasks.value.unshift(task1);
+tasks.value.unshift(task1); */
 </script>
 
 <style scoped>
