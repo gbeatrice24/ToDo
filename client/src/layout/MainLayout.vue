@@ -26,8 +26,9 @@ import TodoHeader from "./TodoHeader.vue";
 import TaskCard from "@/components/TaskCard.vue";
 import { Task } from "@/types/task";
 import { SortingOptionLabel } from "@/types/sorting-option"
+import { client } from "@/http.service"
 
-import { ref, computed } from "vue";
+import { ref, computed, onMounted } from "vue";
 import FilterTodos from "@/components/FilterTodos.vue";
 
 const tasks = ref<Task[]>([]);
@@ -36,22 +37,43 @@ const localSortingOption = ref<SortingOptionLabel>("Title");
 
 const localIsAscending = ref(true)
 
-const nextId = computed(() => tasks.value.length)
 const isEmpty = computed(() => tasks.value.length == 0)
 
 
 const filteredTasks = computed(() => {
-    let result = tasks.value.filter((task) =>
-        task.name.toLowerCase().includes(querySearch.value.toLowerCase()) ||
-        task.desc.toLowerCase().includes(querySearch.value.toLowerCase()))
+    const result = tasks.value.filter((task) => {
+        if (!task || typeof task.name !== "string" || typeof task.desc !== "string") {
+            console.warn("Invalid task:", task);
+            return false;
+        }
+
+        return (
+            task.name.toLowerCase().includes(querySearch.value.toLowerCase()) ||
+            task.desc.toLowerCase().includes(querySearch.value.toLowerCase())
+        );
+    })
 
     sortArray(result);
 
     const editing = result.filter(task => task.editing);
     const others = result.filter(task => !task.editing);
 
+    console.log(filteredTasks)
+
     return [...editing, ...others];
 })
+
+onMounted(async () => {
+    const data = await client.get('/todos');
+    console.log("Raw todos from server:", data);
+    if (data) {
+        tasks.value = data.map((task: Task) => ({
+            ...task,
+            date: new Date(task.date) // convert it, because server sends it as a string
+        }));
+        console.log("Loaded todos:", tasks.value);
+    }
+});
 
 function sortArray(array: Task[]) {
     switch (localSortingOption.value) {
@@ -93,7 +115,7 @@ function handleAddTask() {
     tasks.value.map((task) => (task.editing = false));
 
     const task = {
-        id: nextId.value,
+        id: "",
         name: "",
         desc: "",
         priority: "Priority",
@@ -102,64 +124,104 @@ function handleAddTask() {
         editing: true,
     };
 
+
     tasks.value.unshift(task);
     console.log("new task added:", task);
 }
 
-function handleDoneClicked(id: number) {
+async function handleDoneClicked(id: string) {
     const index = tasks.value.findIndex(task => task.id === id);
     if (index !== -1) {
         const task = tasks.value[index]
+        const newDoneState = !task.done
+        const updatedTask = await client.put(`/todos/${id}/done`, { doneState: newDoneState });
 
-        tasks.value.splice(index, 1, {
-            ...task,
-            done: !task.done,
-        });
+        if (updatedTask) {
+            tasks.value.splice(index, 1, { ...updatedTask, done: newDoneState });
 
-        console.log("Task", id, "done modified");
+            console.log("Task", id, "done modified");
+        }
     }
 }
 
-function handleEditRequested(id: number) {
-    tasks.value.map((task) => {
-        task.editing = task.id === id;
-    });
+async function handleEditRequested(id: string) {
+    const index = tasks.value.findIndex(task => task.id === id);
+    if (index !== -1 && id !== "") {
+        const task = tasks.value[index]
+        const newEditState = !task.editing;
+
+
+        const updatedTask = await client.put(`/todos/${id}/done`, { editing: newEditState });
+        if (updatedTask) {
+            console.log("Task", id, "editing state toggled");
+
+            tasks.value.map((task) => {
+                task.editing = task.id === id;
+            });
+        }
+    }
 }
 
-function handleSaveClicked(payload: {
-    id: number;
+async function handleSaveClicked(payload: {
+    id: string;
     newName: string;
     newDesc: string;
     newPriority: string;
 }) {
     const { id, newName, newDesc, newPriority } = payload;
     const index = tasks.value.findIndex(task => task.id === id);
+    const isNewTask = id === "";
 
-    if (index !== -1) {
-        const task = tasks.value[index]
-        tasks.value.splice(index, 1, {
-            ...task,
+    if (!isNewTask) {
+        const updatedTask = await client.put(`/todos/${id}/update`, {
             name: newName,
             desc: newDesc,
             priority: newPriority,
-            editing: false,
         });
 
-        console.log("Task", id, "changed", newName, newDesc, newPriority);
+        console.log("ipdated name: ", updatedTask.name)
+
+        if (updatedTask) {
+            tasks.value.splice(index, 1, {
+                ...updatedTask,
+                date: new Date(updatedTask.date),
+                editing: false,
+            });
+
+            console.log("Task", id, "changed", newName, newDesc, newPriority);
+        }
+    }
+    else {
+        const savedTask = await client.post(`/todos/`, {
+            name: newName,
+            desc: newDesc,
+            priority: newPriority,
+            userId: "688a0de176a2656ea3527afb",
+        });
+
+        if (savedTask) {
+            tasks.value.splice(index, 1, {
+                ...savedTask,
+                editing: false,
+            });
+        }
     }
 }
 
-function handleDeleteClicked(id: number) {
+async function handleDeleteClicked(id: string) {
     const index = tasks.value.findIndex(task => task.id === id);
 
-    if (index !== -1) {
-        console.log("Before delete", [...tasks.value]);
-        tasks.value.splice(index, 1);
-        console.log("After delete", [...tasks.value]);
+    const resp = await client.delete(`/todos/${id}`);
+
+    if (resp) {
+
+        if (index !== -1) {
+            tasks.value.splice(index, 1);
+        }
     }
 }
 
-function handlePriorityChoosen(payload: { id: number; priority: string }) {
+function handlePriorityChoosen(payload: { id: string; priority: string }) {
     const { id, priority } = payload;
     const index = tasks.value.findIndex(task => task.id === id);
 
@@ -182,43 +244,6 @@ function handleOrder(isAscending: boolean) {
     localIsAscending.value = isAscending
 }
 
-
-
-
-
-/* //////// TEST /////////
-const task3 = {
-    id: nextId.value,
-    name: "a This is the first title",
-    desc: "b This is the second description, lastest date",
-    priority: "Low",
-    done: false,
-    date: new Date("2023-01-01"),
-    editing: false,
-};
-tasks.value.unshift(task3);
-
-const task2 = {
-    id: nextId.value,
-    name: "c This is the third title",
-    desc: "a This is the first description second date",
-    priority: "Medium",
-    done: false,
-    date: new Date("2024-01-01"),
-    editing: false,
-};
-tasks.value.unshift(task2);
-
-const task1 = {
-    id: nextId.value,
-    name: "b This is the second title",
-    desc: "c This is the last description, the newest date",
-    priority: "High",
-    done: false,
-    date: new Date("2025-01-01"),
-    editing: false,
-};
-tasks.value.unshift(task1); */
 </script>
 
 <style scoped>

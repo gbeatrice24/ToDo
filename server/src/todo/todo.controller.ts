@@ -1,0 +1,120 @@
+import { Request, Response } from "express";
+import Todo from "./todo.model";
+import {
+  getTodoService,
+  insertTodoService,
+  updateTodoService,
+  updateTodoDoneService,
+  updateTodoEditingService,
+} from "./todo.service";
+
+export async function getTodos(req: Request, res: Response) {
+  try {
+    const todos = await getTodoService();
+    res.status(200).json(todos);
+  } catch (error) {
+    res.status(500).json({ error: "Failed to fetch todos" });
+  }
+}
+
+// insert todo
+export async function insertTodo(req: Request, res: Response) {
+  const { name, desc, priority, userId } = req.body;
+  try {
+    const savedTodo = await insertTodoService(name, desc, priority, userId);
+
+    const todoObj = savedTodo.toObject();
+
+    res.status(200).json({
+      ...todoObj,
+      id: todoObj._id.toString(),
+    });
+  } catch (err) {
+    res.status(500).json({ error: "Failed to insert todo" });
+  }
+}
+
+export async function updateTodo(req: Request, res: Response) {
+  const { id } = req.params;
+  const { name, desc, priority } = req.body;
+  try {
+    const updatedTodo = await updateTodoService(id, name, desc, priority);
+
+    if (!updatedTodo) {
+      return res.status(404).json({ error: "Todo not found" });
+    }
+
+    console.log("the updated tasks date", updatedTodo.date);
+
+    const todoObj = updatedTodo.toObject();
+
+    res.status(200).json({
+      ...todoObj,
+      id: todoObj._id.toString(),
+    });
+  } catch (err) {
+    res.status(500).json({ error: "Failed to update todo" });
+  }
+}
+
+export async function updateTodoDone(req: Request, res: Response) {
+  const { id } = req.params;
+  const { doneState } = req.body;
+  try {
+    const updatedTodo = await updateTodoDoneService(id, doneState);
+
+    if (!updatedTodo) {
+      return res.status(404).json({ error: "Todo not found" });
+    }
+
+    const todoObj = updatedTodo.toObject();
+
+    res.status(200).json({
+      ...todoObj,
+      id: todoObj._id.toString(),
+    });
+  } catch (err) {
+    res.status(500).json({ error: "Failed to update todo" });
+  }
+}
+
+export async function updateTodoEditing(req: Request, res: Response) {
+  const { id } = req.params;
+  const { editState } = req.body;
+
+  try {
+    await Todo.updateMany({}, { $set: { editing: false } });
+
+    const updatedTodo = await updateTodoEditingService(id, editState);
+
+    if (!updatedTodo) {
+      return res.status(404).json({ error: "Todo not found" });
+    }
+
+    const todoObj = updatedTodo.toObject();
+
+    res.status(200).json({
+      ...todoObj,
+      id: todoObj._id.toString(),
+    });
+  } catch (err) {
+    res.status(500).json({ error: "Failed to update todo" });
+  }
+}
+
+export async function deleteTodo(req: Request, res: Response) {
+  const { id } = req.params;
+
+  try {
+    const deletedTodo = await Todo.findByIdAndDelete(id);
+
+    if (!deletedTodo) {
+      return res.status(404).json({ error: "Todo not found" });
+    }
+
+    res.status(200).json({ message: "Todo deleted successfully" });
+  } catch (err) {
+    res.status(500).json({ error: "Failed to delete todo" });
+    console.log("error", err);
+  }
+}

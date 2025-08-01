@@ -45,19 +45,31 @@ export async function createTestModels() {
   const testUser = new User({
     name: "testuser1",
     email: "test1@test.com",
-    password: "p",
+    password: "testuser1",
   });
 
-  testUser.save();
+  await testUser.save();
 
   const testTodo = new Todo({
-    title: "task1",
+    name: "task1",
     desc: "task1 desc",
-    priority: "High",
-    date: "25-1-1",
-    completed: false,
+    priority: "Medium",
+    date: new Date(),
+    done: false,
+    editing: false,
     user: testUser._id,
   });
 
-  testTodo.save();
+  const testTodo2 = new Todo({
+    name: "task2",
+    desc: "task2 desc",
+    priority: "High",
+    date: new Date(),
+    done: false,
+    editing: false,
+    user: testUser._id,
+  });
+
+  await testTodo.save();
+  await testTodo2.save();
 }
