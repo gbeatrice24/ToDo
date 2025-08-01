@@ -26,6 +26,7 @@ import TodoHeader from "./TodoHeader.vue";
 import TaskCard from "@/components/TaskCard.vue";
 import { Task } from "@/types/task";
 import { SortingOptionLabel } from "@/types/sorting-option"
+import { httpGet, httpPost, httpPut, httpDelete } from "@/http.service"
 
 import { ref, computed, onMounted } from "vue";
 import FilterTodos from "@/components/FilterTodos.vue";
@@ -52,7 +53,6 @@ const filteredTasks = computed(() => {
         );
     })
 
-
     sortArray(result);
 
     const editing = result.filter(task => task.editing);
@@ -65,8 +65,7 @@ const filteredTasks = computed(() => {
 
 onMounted(async () => {
     try {
-        const response = await fetch("http://localhost:8080/api/todos");
-        const data = await response.json();
+        const data = await httpGet('/todos');
         tasks.value = data.map((task: Task) => ({
             ...task,
             date: new Date(task.date) // convert it, because server sends it as a string
@@ -138,17 +137,7 @@ async function handleDoneClicked(id: string) {
         const newDoneState = !task.done
 
         try {
-            const response = await fetch(`http://localhost:8080/api/todos/${id}/done`, {
-                method: "PUT",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({
-                    doneState: newDoneState
-                }),
-            });
-
-            const updatedTask = await response.json();
+            const updatedTask = await httpPut(`/todos/${id}/done`, { doneState: newDoneState });
 
             tasks.value.splice(index, 1,
                 updatedTask
@@ -168,17 +157,7 @@ async function handleEditRequested(id: string) {
         const newEditState = !task.editing;
 
         try {
-            const response = await fetch(`http://localhost:8080/api/todos/${id}/editing`, {
-                method: "PUT",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({
-                    editing: newEditState
-                }),
-            });
-
-            const updatedTask = await response.json();
+            const updatedTask = await httpPut(`/todos/${id}/done`, { editing: newEditState });
 
             tasks.value.splice(index, 1, updatedTask);
 
@@ -204,19 +183,11 @@ async function handleSaveClicked(payload: {
     const isNewTask = id === "";
 
     if (!isNewTask) {
-        const response = await fetch(`http://localhost:8080/api/todos/${id}/update`, {
-            method: "PUT",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-                name: newName,
-                desc: newDesc,
-                priority: newPriority,
-            }),
+        const updatedTask = await httpPut(`/todos/${id}/update`, {
+            name: newName,
+            desc: newDesc,
+            priority: newPriority,
         });
-
-        const updatedTask = await response.json();
 
         tasks.value.splice(index, 1, {
             ...updatedTask,
@@ -227,21 +198,13 @@ async function handleSaveClicked(payload: {
         console.log("Task", id, "changed", newName, newDesc, newPriority);
     }
     else {
-        const response = await fetch("http://localhost:8080/api/todos", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-                name: newName,
-                desc: newDesc,
-                priority: newPriority,
-                date: new Date().toISOString(),
-                userId: "688a0de176a2656ea3527afb", // here will come the user id, for now i hardcode the test users
-            }),
+        const savedTask = await httpPost(`/todos/`, {
+            name: newName,
+            desc: newDesc,
+            priority: newPriority,
+            date: new Date().toISOString(),
+            userId: "688a0de176a2656ea3527afb",
         });
-
-        const savedTask = await response.json();
 
         tasks.value.splice(index, 1, {
             ...savedTask,
@@ -260,9 +223,7 @@ async function handleDeleteClicked(id: string) {
     }
 
     try {
-        await fetch(`http://localhost:8080/api/todos/${id}`, {
-            method: "DELETE",
-        });
+        await httpDelete(`/todos/${id}`);
     } catch (err) {
         console.error("error:", err);
     }
