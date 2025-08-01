@@ -29,8 +29,8 @@ app.get("/", async (_req, res) => {
   res.send(":)");
 });
 
-app.use("/api", todoRoutes);
-app.use("/api", userRoutes);
+app.use("/api/todos", todoRoutes);
+app.use("/api/user", userRoutes);
 
 connectDB().then(() => {
   app.listen(PORT, () => {

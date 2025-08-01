@@ -1,10 +1,12 @@
 import { Request, Response } from "express";
 import Todo from "./todo.model";
-import { getTodoService } from "./todo.service/getTodo.service";
-import { insertTodoService } from "./todo.service/insertTodo.service";
-import { updateTodoService } from "./todo.service/updateTodo.service";
-import { updateTodoDoneService } from "./todo.service/updateTodoDone.service";
-import { updateTodoEditingService } from "./todo.service/updateTodoEditing.service";
+import {
+  getTodoService,
+  insertTodoService,
+  updateTodoService,
+  updateTodoDoneService,
+  updateTodoEditingService,
+} from "./todo.service";
 
 export async function getTodos(req: Request, res: Response) {
   try {
